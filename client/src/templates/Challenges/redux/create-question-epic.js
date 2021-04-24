@@ -53,23 +53,26 @@ function createQuestionEpic(action$, state$, { window }) {
         ${href}`
       );
 
-      let textMessage = dedent(
-        `**Tell us what's happening:**
-        Describe your issue in detail here.
+      let textMessage = dedent(`
+        **Tell us what's happening:**
+  Describe your issue in detail here.
 
-        ${
-          projectFormValues.length
-            ? `**Your project link(s)**\n`
-            : `**Your code so far**`
-        }
-        ${
-          projectFormValues
-            ?.map(([key, val]) => `${key}: ${transformEditorLink(val)}\n`)
-            ?.join('') || filesToMarkdown(files)
-        }
+  ${
+    projectFormValues.length
+      ? `**Your project link(s)**\n`
+      : `**Your code so far**`
+  }
+  ${
+    projectFormValues
+      ?.map(
+        ([key, val]) => `Original: ${val}\n
+      ${key}: ${transformEditorLink(val)}\n`
+      )
+      ?.join('') || filesToMarkdown(files)
+  }
 
-        ${endingText}`
-      );
+  ${endingText}
+      `);
 
       const altTextMessage = dedent(
         `**Tell us what's happening:**
