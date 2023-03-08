@@ -7,7 +7,7 @@ const config = {
         loose: true,
         modules: false,
         useBuiltIns: 'usage',
-        corejs: 2,
+        corejs: '3.29',
         shippedProposals: true,
         targets: {
           browsers: ['>0.25%', 'not dead']

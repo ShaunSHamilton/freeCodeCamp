@@ -1,4 +1,4 @@
-import '@babel/polyfill';
+import 'core-js/stable';
 import jQuery from 'jquery';
 import * as helpers from '@freecodecamp/curriculum-helpers';
 

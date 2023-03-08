@@ -1,5 +1,5 @@
 import chai from 'chai';
-import '@babel/polyfill';
+import 'core-js/stable';
 import { toString as __toString } from 'lodash-es';
 import * as helpers from '@freecodecamp/curriculum-helpers';
 import { format as __format } from '../../utils/format';

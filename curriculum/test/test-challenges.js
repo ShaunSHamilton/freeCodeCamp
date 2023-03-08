@@ -16,7 +16,7 @@ const stringSimilarity = require('string-similarity');
 mockRequire('lodash-es', lodash);
 
 const clientPath = path.resolve(__dirname, '../../client');
-require('@babel/polyfill');
+require('core-js/stable');
 require('@babel/register')({
   root: clientPath,
   babelrc: false,
