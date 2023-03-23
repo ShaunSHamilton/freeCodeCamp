@@ -38,6 +38,16 @@ tasks:
       mkdir -p /workspace/data &&
       (mongod --dbpath /workspace/data &)
 
+  - name: gitpod-mode
+    command: >
+      echo "Choose a mode to run in:" &&
+      echo "1. Standard (default)" &&
+      echo "2. Server" &&
+      echo "3. Client" &&
+      echo "4. Api" &&
+      read GITPOD_MODE
+      export GITPOD_MODE=$(echo "$GITPOD_MODE" | tr '[:upper:]' '[:lower:]')
+
   - name: server
     before: export COOKIE_DOMAIN=gitpod.io && export HOME_LOCATION=$(gp url 8000) && export API_LOCATION=$(gp url 3000) && export CYPRESS_BASE_URL=$(gp url 8000)
     # init is not executed for prebuilt workspaces and restarts,
@@ -50,6 +60,7 @@ tasks:
       pnpm run seed &&
       mongo --eval "db.fsyncLock(); db.fsyncUnlock()"
     command: >
+      [$GITPOD_MODE == "" || $GITPOD_MODE == "standard" || $GITPOD_MODE == "1" || $GITPOD_MODE == "server" || $GITPOD_MODE == "2"] &&
       pnpm run create:config &&
       pnpm run build:curriculum &&
       gp ports await 27017 &&
@@ -63,10 +74,18 @@ tasks:
       pnpm run predevelop &&
       cd ..
     command: >
+      [$GITPOD_MODE == "" || $GITPOD_MODE == "standard" || $GITPOD_MODE == "1" || $GITPOD_MODE == "client" || $GITPO_MODE == "3"] &&
       gp ports await 3000 &&
       cd ./client &&
       pnpm run develop -- -H '0.0.0.0'
     openMode: split-right
+
+  - name: api
+    before: export HOME_LOCATION=$(gp url 8000) && export API_LOCATION=$(gp url 3000) && export CYPRESS_BASE_URL=$(gp url 8000)
+    command: >
+      [$GITPOD_MODE == "" || $GITPOD_MODE == "standard" || $GITPOD_MODE == "1" || $GITPOD_MODE == "api" || $GITPO_MODE == "4"] &&
+      cd ./api &&
+      pnpm run develop
 
 github:
   prebuilds:
