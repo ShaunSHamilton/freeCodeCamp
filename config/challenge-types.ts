@@ -20,6 +20,7 @@ const exam = 17;
 const msTrophyUrl = 18;
 const multipleChoice = 19;
 const python = 20;
+const sandpack = 21;
 
 export const challengeTypes = {
   html,
@@ -43,7 +44,8 @@ export const challengeTypes = {
   exam,
   msTrophyUrl,
   multipleChoice,
-  python
+  python,
+  sandpack
 };
 
 export const isFinalProject = (challengeType: number) => {
@@ -94,7 +96,8 @@ export const viewTypes = {
   [exam]: 'exam',
   [msTrophyUrl]: 'frontend',
   [multipleChoice]: 'video',
-  [python]: 'modern'
+  [python]: 'modern',
+  [sandpack]: 'sandpack'
 };
 
 // determine the type of submit function to use for the challenge on completion
@@ -122,5 +125,6 @@ export const submitTypes = {
   [exam]: 'exam',
   [msTrophyUrl]: 'project.frontEnd',
   [multipleChoice]: 'tests',
-  [python]: 'tests'
+  [python]: 'tests',
+  [sandpack]: 'tests'
 };

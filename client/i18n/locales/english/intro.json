@@ -59,6 +59,21 @@
       }
     }
   },
+  "sandpack": {
+    "title": "Sandpack",
+    "intro": ["Sandpack intor"],
+    "note": "Note: Some browser extensions, such as ad-blockers and dark mode extensions can interfere with the tests. If you face issues, we recommend disabling extensions that modify the content or layout of pages, while taking the course.",
+    "blocks": {
+      "learn-react": {
+        "title": "Learn React",
+        "intro": ["Example learn react intro"]
+      },
+      "build-a-pack-of-sand": {
+        "title": "Build a Pack of Sand",
+        "intro": ["example sand intro"]
+      }
+    }
+  },
   "2022/responsive-web-design": {
     "title": "Responsive Web Design",
     "intro": [

@@ -44,6 +44,11 @@ const exam = path.resolve(
   '../../src/templates/Challenges/exam/show.tsx'
 );
 
+const sandpack = path.resolve(
+  __dirname,
+  '../../src/templates/Challenges/sandpack/show.tsx'
+);
+
 const views = {
   backend,
   classic,
@@ -52,7 +57,8 @@ const views = {
   video,
   codeAlly,
   odin,
-  exam
+  exam,
+  sandpack
   // quiz: Quiz
 };
 
@@ -133,14 +139,14 @@ function getProjectPreviewConfig(challenge, allChallengeEdges) {
     .map(({ node: { challenge } }) => challenge);
   const lastChallenge = challengesInBlock[challengesInBlock.length - 1];
   const solutionToLastChallenge = sortChallengeFiles(
-    lastChallenge.solutions[0] ?? []
+    lastChallenge?.solutions?.[0] ?? []
   );
   const lastChallengeFiles = sortChallengeFiles(
-    lastChallenge.challengeFiles ?? []
+    lastChallenge?.challengeFiles ?? []
   );
   const projectPreviewChallengeFiles = lastChallengeFiles.map((file, id) => ({
     ...file,
-    contents: solutionToLastChallenge[id]?.contents ?? file.contents
+    contents: solutionToLastChallenge?.[id]?.contents ?? file.contents
   }));
 
   return {
@@ -151,7 +157,7 @@ function getProjectPreviewConfig(challenge, allChallengeEdges) {
       // TODO: revert this to enable project previews for python challenges
       challengeType !== challengeTypes.python,
     challengeData: {
-      challengeType: lastChallenge.challengeType,
+      challengeType: lastChallenge?.challengeType,
       challengeFiles: projectPreviewChallengeFiles
     }
   };

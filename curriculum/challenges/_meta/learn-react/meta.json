@@ -1,0 +1,17 @@
+{
+  "name": "Learn React",
+  "isUpcomingChange": true,
+  "dashedName": "learn-react",
+  "order": 21,
+  "helpCategory": "Backend Development",
+  "time": "30 hours",
+  "template": "",
+  "required": [],
+  "superBlock": "sandpack",
+  "challengeOrder": [
+    {
+      "id": "5a24c314108449a4d403616e",
+      "title": "Lesson 1"
+    }
+  ]
+}

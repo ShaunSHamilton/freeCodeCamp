@@ -1,0 +1,17 @@
+{
+  "name": "Build a Pack of Sand",
+  "isUpcomingChange": true,
+  "dashedName": "build-a-pack-of-sand",
+  "order": 21,
+  "helpCategory": "Backend Development",
+  "time": "30 hours",
+  "template": "",
+  "required": [],
+  "superBlock": "sandpack",
+  "challengeOrder": [
+    {
+      "id": "bd7158d8c442edefaeb5bd18",
+      "title": "Build a Pack of Sand"
+    }
+  ]
+}

@@ -29,6 +29,7 @@ const collegeAlgebraPyBase = '/learn/college-algebra-with-python';
 const takeHomeBase = '/learn/coding-interview-prep/take-home-projects';
 const foundationalCSharpBase = '/learn/foundational-c-sharp-with-microsoft';
 const upcomingPythonBase = '/learn/upcoming-python';
+const sandpackBase = '/learn/sandpack';
 const exampleCertBase = '/learn/example-certification';
 const legacyFrontEndBase = feLibsBase;
 const legacyFrontEndResponsiveBase = responsiveWebBase;
@@ -781,6 +782,19 @@ const upcomingCertMap = [
         title: 'Upcoming Python Project',
         link: `${upcomingPythonBase}/upcoming-python-project`,
         certSlug: 'upcoming-python-v8'
+      }
+    ]
+  },
+  {
+    id: '561add10cb82ac39a17513bc',
+    title: 'Sandpack Certification',
+    certSlug: 'sandpack-v8',
+    projects: [
+      {
+        id: 'bd7158d8c442edefaeb5bd18',
+        title: 'Build a Pack of Sand',
+        link: `${sandpackBase}/build-a-pack-of-sand`,
+        certSlug: 'sandpack-v8'
       }
     ]
   }

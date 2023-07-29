@@ -82,6 +82,7 @@ const directoryToSuperblock = {
   '19-foundational-c-sharp-with-microsoft':
     'foundational-c-sharp-with-microsoft',
   '20-upcoming-python': 'upcoming-python',
+  '21-sandpack': 'sandpack',
   '99-example-certification': 'example-certification'
 };
 
