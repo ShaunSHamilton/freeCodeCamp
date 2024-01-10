@@ -11,12 +11,16 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
 
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
+COPY config.yaml ~/.config/code-server/config.yaml
+
 # Example adding tooling: Install Rust
 # RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 COPY freecodecamp-courses-2.0.0.vsix $HOME
+COPY freecodecamp-dark-vscode-theme-1.0.0.vsix $HOME
+RUN code-server --install-extension freecodecamp-courses-2.0.0.vsix
+RUN code-server --install-extension freecodecamp-dark-vscode-theme-1.0.0.vsix
 # code-server --host 0.0.0.0 --auth none
-CMD ["code-server", "--host", "0.0.0.0", "--auth", "none"]
-CMD ["code-server", "--install-extension", "freecodecamp-courses-2.0.0.vsix"]
+CMD ["code-server"]
 
 # TODO: Needed?
 USER root
