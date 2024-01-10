@@ -11,7 +11,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
 
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-COPY config.yaml ~/.config/code-server/config.yaml
+COPY config.yml ~/.config/code-server/
 
 # Example adding tooling: Install Rust
 # RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
