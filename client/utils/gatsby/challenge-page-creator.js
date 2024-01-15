@@ -21,6 +21,10 @@ const codeAlly = path.resolve(
   __dirname,
   '../../src/templates/Challenges/codeally/show.tsx'
 );
+const freeCodeCampOS = path.resolve(
+  __dirname,
+  '../../src/templates/Challenges/freecodecamp-os/show.tsx'
+);
 const intro = path.resolve(
   __dirname,
   '../../src/templates/Introduction/intro.tsx'
@@ -66,6 +70,7 @@ const views = {
   frontend,
   video,
   codeAlly,
+  freeCodeCampOS,
   odin,
   exam,
   msTrophy,

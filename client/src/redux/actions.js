@@ -105,6 +105,12 @@ export const hideCodeAlly = createAction(actionTypes.hideCodeAlly);
 export const showCodeAlly = createAction(actionTypes.showCodeAlly);
 export const tryToShowCodeAlly = createAction(actionTypes.tryToShowCodeAlly);
 
+export const hideFreeCodeCampOS = createAction(actionTypes.hideFreeCodeCampOS);
+export const showFreeCodeCampOS = createAction(actionTypes.showFreeCodeCampOS);
+export const tryToShowFreeCodeCampOS = createAction(
+  actionTypes.tryToShowFreeCodeCampOS
+);
+
 export const startExam = createAction(actionTypes.startExam);
 export const stopExam = createAction(actionTypes.stopExam);
 export const clearExamResults = createAction(actionTypes.clearExamResults);

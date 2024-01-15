@@ -20,7 +20,8 @@ function createChallengeNode(
     typeof challenge.description !== 'string' &&
     challenge.challengeType !== 11 &&
     challenge.challengeType !== 7 &&
-    challenge.challengeType !== 12
+    challenge.challengeType !== 12 &&
+    challenge.challengeType !== 23
   ) {
     reporter.warn(`
 

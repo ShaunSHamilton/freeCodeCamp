@@ -1437,6 +1437,18 @@
       }
     }
   },
+  "freecodecamp-os": {
+    "title": "freeCodeCamp-OS",
+    "intro": [
+      "For these courses, you will use real developer tools and software including VS Code, PostgreSQL, and the Linux / Unix command line to complete interactive tutorials and build projects."
+    ],
+    "blocks": {
+      "learn-freecodecamp-os": {
+        "title": "Learn freeCodeCamp-OS",
+        "intro": ["freeCodeCamp what!?"]
+      }
+    }
+  },
   "misc-text": {
     "certification": "{{cert}} Certification",
     "browse-other": "Browse our other free certifications\n(we recommend doing these in order)",

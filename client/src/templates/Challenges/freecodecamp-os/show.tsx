@@ -20,11 +20,14 @@ import { challengeTypes } from '../../../../../shared/config/challenge-types';
 import CompletionModal from '../components/completion-modal';
 import HelpModal from '../components/help-modal';
 import Hotkeys from '../components/hotkeys';
-import { hideCodeAlly, tryToShowCodeAlly } from '../../../redux/actions';
+import {
+  hideFreeCodeCampOS,
+  tryToShowFreeCodeCampOS
+} from '../../../redux/actions';
 import {
   completedChallengesSelector,
   partiallyCompletedChallengesSelector,
-  showCodeAllySelector,
+  showFreeCodeCampOSSelector,
   isSignedInSelector,
   userTokenSelector
 } from '../../../redux/selectors';
@@ -44,10 +47,8 @@ import {
 import ProjectToolPanel from '../projects/tool-panel';
 import SolutionForm from '../projects/solution-form';
 import { FlashMessages } from '../../../components/Flash/redux/flash-messages';
-import { SuperBlocks } from '../../../../../shared/config/superblocks';
-import { CodeAllyDown } from '../../../components/growth-book/codeally-down';
 
-import './codeally.css';
+import './freecodecamp-os.css';
 
 // Redux
 const mapStateToProps = createSelector(
@@ -55,21 +56,21 @@ const mapStateToProps = createSelector(
   isChallengeCompletedSelector,
   isSignedInSelector,
   partiallyCompletedChallengesSelector,
-  showCodeAllySelector,
+  showFreeCodeCampOSSelector,
   userTokenSelector,
   (
     completedChallenges: CompletedChallenge[],
     isChallengeCompleted: boolean,
     isSignedIn: boolean,
     partiallyCompletedChallenges: CompletedChallenge[],
-    showCodeAlly: boolean,
+    showFreeCodeCampOS: boolean,
     userToken: string | null
   ) => ({
     completedChallenges,
     isChallengeCompleted,
     isSignedIn,
     partiallyCompletedChallenges,
-    showCodeAlly,
+    showFreeCodeCampOS,
     userToken
   })
 );
@@ -79,9 +80,9 @@ const mapDispatchToProps = (dispatch: Dispatch) =>
     {
       challengeMounted,
       createFlashMessage,
-      hideCodeAlly,
+      hideFreeCodeCampOS,
       openCompletionModal: () => openModal('completion'),
-      tryToShowCodeAlly,
+      tryToShowFreeCodeCampOS,
       updateChallengeMeta,
       updateSolutionFormValues
     },
@@ -89,12 +90,12 @@ const mapDispatchToProps = (dispatch: Dispatch) =>
   );
 
 // Types
-interface ShowCodeAllyProps {
+interface ShowFreeCodeCampOSProps {
   challengeMounted: (arg0: string) => void;
   completedChallenges: CompletedChallenge[];
   createFlashMessage: typeof createFlashMessage;
   data: { challengeNode: ChallengeNode };
-  hideCodeAlly: () => void;
+  hideFreeCodeCampOS: () => void;
   isChallengeCompleted: boolean;
   isSignedIn: boolean;
   openCompletionModal: () => void;
@@ -102,15 +103,15 @@ interface ShowCodeAllyProps {
     challengeMeta: ChallengeMeta;
   };
   partiallyCompletedChallenges: CompletedChallenge[];
-  showCodeAlly: boolean;
+  showFreeCodeCampOS: boolean;
   t: TFunction;
-  tryToShowCodeAlly: () => void;
+  tryToShowFreeCodeCampOS: () => void;
   updateChallengeMeta: (arg0: ChallengeMeta) => void;
   updateSolutionFormValues: () => void;
   userToken: string | null;
 }
 
-class ShowCodeAlly extends Component<ShowCodeAllyProps> {
+class ShowFreeCodeCampOS extends Component<ShowFreeCodeCampOSProps> {
   static displayName: string;
   private container: React.RefObject<HTMLElement> = React.createRef();
 
@@ -136,7 +137,7 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
   }
 
   componentWillUnmount() {
-    this.props.hideCodeAlly();
+    this.props.hideFreeCodeCampOS();
   }
 
   handleSubmit = ({
@@ -188,8 +189,7 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
             notes,
             superBlock,
             title,
-            translationPending,
-            url
+            translationPending
           }
         }
       },
@@ -199,9 +199,9 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
         challengeMeta: { nextChallengePath, prevChallengePath }
       },
       partiallyCompletedChallenges,
-      showCodeAlly,
+      showFreeCodeCampOS,
       t,
-      tryToShowCodeAlly,
+      tryToShowFreeCodeCampOS,
       updateSolutionFormValues,
       userToken = null
     } = this.props;
@@ -211,22 +211,6 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
     )}: ${title}`;
     const windowTitle = `${blockNameTitle} | freeCodeCamp.org`;
 
-    // Initial CodeAlly login includes a tempToken in redirect URL
-    const queryParams = new URLSearchParams(window.location.search);
-    const codeAllyTempToken: string | null = queryParams.get('tempToken');
-
-    const tempToken = codeAllyTempToken ? `tempToken=${codeAllyTempToken}` : '';
-
-    // Include a unique param to avoid CodeAlly caching issues
-    const date = `date=${Date.now()}`;
-
-    // User token for submitting CodeRoad tutorials
-    const envVariables = userToken
-      ? `envVariables=CODEROAD_WEBHOOK_TOKEN=${userToken}`
-      : '';
-
-    const goBackTo = `goBackTo=${window.location.href}`;
-
     const isPartiallyCompleted = partiallyCompletedChallenges.some(
       challenge => challenge.id === challengeId
     );
@@ -235,15 +219,15 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
       challenge => challenge.id === challengeId
     );
     const titleContext = t('learn.github-link');
-    return showCodeAlly ? (
+    return showFreeCodeCampOS ? (
       <LearnLayout>
         <Helmet title={windowTitle} />
         <iframe
-          className='codeally-frame'
-          data-cy='codeally-frame'
-          name={`codeAlly${Date.now()}`}
+          className='freecodecamp-os-frame'
+          data-cy='freecodecamp-os-frame'
+          name={`freecodecamp-os${Date.now()}`}
           sandbox='allow-modals allow-forms allow-popups allow-scripts allow-same-origin'
-          src={`https://codeally.io/embed/?repoUrl=${url}&${goBackTo}&${envVariables}&${tempToken}&${date}`}
+          src={`http://localhost:8080?WEBHOOK_TOKEN=${userToken}?workspace=${blockName}`}
           title='Editor'
         />
       </LearnLayout>
@@ -259,7 +243,6 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
             <Row>
               <Col md={8} mdOffset={2} sm={10} smOffset={1} xs={12}>
                 <Spacer size='medium' />
-                {superBlock === SuperBlocks.RelationalDb && <CodeAllyDown />}
                 <Spacer size='medium' />
                 <ChallengeTitle
                   isCompleted={isChallengeCompleted}
@@ -284,7 +267,7 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
                 </div>
                 <Spacer size='medium' />
                 {isSignedIn &&
-                  challengeType === challengeTypes.codeAllyCert && (
+                  challengeType === challengeTypes.freeCodeCampOS && (
                     <>
                       <div className='ca-description'>
                         {t('learn.complete-both-steps')}
@@ -304,22 +287,22 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
                       <Spacer size='medium' />
                     </>
                   )}
-                <Alert id='codeally-cookie-warning' variant='info'>
+                <Alert id='cookie-warning' variant='info'>
                   <p>{t(`intro:misc-text.enable-cookies`)}</p>
                 </Alert>
                 <Button
-                  aria-describedby='codeally-cookie-warning'
+                  aria-describedby='cookie-warning'
                   block={true}
                   variant='primary'
-                  data-cy='start-codeally'
-                  onClick={tryToShowCodeAlly}
+                  data-cy='start-freecodecamp-os'
+                  onClick={tryToShowFreeCodeCampOS}
                 >
-                  {challengeType === challengeTypes.codeAllyCert
+                  {challengeType === challengeTypes.freeCodeCampOS
                     ? t('buttons.click-start-project')
                     : t('buttons.click-start-course')}
                 </Button>
                 {isSignedIn &&
-                  challengeType === challengeTypes.codeAllyCert && (
+                  challengeType === challengeTypes.freeCodeCampOS && (
                     <>
                       <hr />
                       <Spacer size='medium' />
@@ -357,16 +340,16 @@ class ShowCodeAlly extends Component<ShowCodeAllyProps> {
   }
 }
 
-ShowCodeAlly.displayName = 'ShowCodeAlly';
+ShowFreeCodeCampOS.displayName = 'ShowFreeCodeCampOS';
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withTranslation()(ShowCodeAlly));
+)(withTranslation()(ShowFreeCodeCampOS));
 
 // GraphQL
 export const query = graphql`
-  query CodeAllyChallenge($slug: String!) {
+  query FreeCodeCampOSChallenge($slug: String!) {
     challengeNode(challenge: { fields: { slug: { eq: $slug } } }) {
       challenge {
         challengeType
@@ -381,7 +364,6 @@ export const query = graphql`
         superBlock
         title
         translationPending
-        url
       }
     }
   }

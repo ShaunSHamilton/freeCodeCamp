@@ -24,7 +24,8 @@ export enum SuperBlocks {
   UpcomingPython = 'upcoming-python',
   A2English = 'a2-english-for-developers',
   RosettaCode = 'rosetta-code',
-  PythonForEverybody = 'python-for-everybody'
+  PythonForEverybody = 'python-for-everybody',
+  FreeCodeCampOS = 'freecodecamp-os'
 }
 
 /*
@@ -87,7 +88,8 @@ export const superBlockOrder: SuperBlockOrder = {
   [SuperBlockStages.New]: [],
   [SuperBlockStages.Upcoming]: [
     SuperBlocks.ExampleCertification,
-    SuperBlocks.UpcomingPython
+    SuperBlocks.UpcomingPython,
+    SuperBlocks.FreeCodeCampOS
   ]
 };
 
