@@ -226,8 +226,8 @@ class ShowFreeCodeCampOS extends Component<ShowFreeCodeCampOSProps> {
           className='freecodecamp-os-frame'
           data-cy='freecodecamp-os-frame'
           name={`freecodecamp-os${Date.now()}`}
-          sandbox='allow-modals allow-forms allow-popups allow-scripts allow-same-origin'
-          src={`http://localhost:8080?WEBHOOK_TOKEN=${userToken}?workspace=${blockName}`}
+          sandbox='allow-downloads allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation allow-top-navigation-to-custom-protocols'
+          src={`http://localhost:8080?WEBHOOK_TOKEN=${userToken}&workspace=${blockName}`}
           title='Editor'
         />
       </LearnLayout>
