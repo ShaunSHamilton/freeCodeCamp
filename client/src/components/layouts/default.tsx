@@ -27,6 +27,7 @@ import {
   isOnlineSelector,
   isServerOnlineSelector,
   showCodeAllySelector,
+  showFreeCodeCampOSSelector,
   userFetchStateSelector
 } from '../../redux/selectors';
 
@@ -61,6 +62,7 @@ const mapStateToProps = createSelector(
   isServerOnlineSelector,
   userFetchStateSelector,
   showCodeAllySelector,
+  showFreeCodeCampOSSelector,
   userSelector,
   (
     isSignedIn,
@@ -70,6 +72,7 @@ const mapStateToProps = createSelector(
     isServerOnline: boolean,
     fetchState: UserFetchState,
     showCodeAlly: boolean,
+    showFreeCodeCampOS: boolean,
     user: User
   ) => ({
     isSignedIn,
@@ -81,6 +84,7 @@ const mapStateToProps = createSelector(
     fetchState,
     theme: user.theme,
     showCodeAlly,
+    showFreeCodeCampOS,
     user
   })
 );
@@ -109,6 +113,7 @@ interface DefaultLayoutProps extends StateProps, DispatchProps {
   block?: string;
   examInProgress: boolean;
   showCodeAlly: boolean;
+  showFreeCodeCampOS: boolean;
   superBlock?: string;
 }
 
@@ -135,6 +140,7 @@ function DefaultLayout({
   superBlock,
   theme,
   showCodeAlly,
+  showFreeCodeCampOS,
   user,
   fetchUser,
   updateAllChallengesInfo
@@ -248,14 +254,17 @@ function DefaultLayout({
             />
           ) : null}
           <SignoutModal />
-          {isChallenge && !showCodeAlly && !examInProgress && (
-            <div className='breadcrumbs-demo'>
-              <BreadCrumb
-                block={block as string}
-                superBlock={superBlock as string}
-              />
-            </div>
-          )}
+          {isChallenge &&
+            !showCodeAlly &&
+            !examInProgress &&
+            !showFreeCodeCampOS && (
+              <div className='breadcrumbs-demo'>
+                <BreadCrumb
+                  block={block as string}
+                  superBlock={superBlock as string}
+                />
+              </div>
+            )}
           {fetchState.complete && children}
         </div>
         {showFooter && <Footer />}

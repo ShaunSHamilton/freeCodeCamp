@@ -82,6 +82,10 @@ export const showCodeAllySelector = state => {
   return state[MainApp].showCodeAlly;
 };
 
+export const showFreeCodeCampOSSelector = state => {
+  return state[MainApp].showFreeCodeCampOS;
+};
+
 export const examInProgressSelector = state => {
   return state[MainApp].examInProgress;
 };

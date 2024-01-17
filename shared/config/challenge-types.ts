@@ -22,6 +22,7 @@ const multipleChoice = 19;
 const python = 20;
 const dialogue = 21;
 const fillInTheBlank = 22;
+const freeCodeCampOS = 23;
 
 export const challengeTypes = {
   html,
@@ -47,7 +48,8 @@ export const challengeTypes = {
   multipleChoice,
   python,
   dialogue,
-  fillInTheBlank
+  fillInTheBlank,
+  freeCodeCampOS
 };
 
 export const isFinalProject = (challengeType: number) => {
@@ -102,7 +104,8 @@ export const viewTypes = {
   [multipleChoice]: 'odin',
   [python]: 'modern',
   [dialogue]: 'dialogue',
-  [fillInTheBlank]: 'fillInTheBlank'
+  [fillInTheBlank]: 'fillInTheBlank',
+  [freeCodeCampOS]: 'freeCodeCampOS'
 };
 
 // determine the type of submit function to use for the challenge on completion
@@ -132,5 +135,6 @@ export const submitTypes = {
   [multipleChoice]: 'tests',
   [python]: 'tests',
   [dialogue]: 'tests',
-  [fillInTheBlank]: 'tests'
+  [fillInTheBlank]: 'tests',
+  [freeCodeCampOS]: 'project.frontEnd'
 };

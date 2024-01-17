@@ -10,6 +10,7 @@ import { createAcceptTermsSaga } from './accept-terms-saga';
 import { actionTypes, ns as MainApp } from './action-types';
 import { createAppMountSaga } from './app-mount-saga';
 import { createCodeAllySaga } from './codeally-saga';
+import { createFreeCodeCampOSSaga } from './freecodecamp-os-saga';
 import { createDonationSaga } from './donation-saga';
 import failedUpdatesEpic from './failed-updates-epic';
 import { createFetchUserSaga } from './fetch-user-saga';
@@ -64,6 +65,7 @@ const initialState = {
     ...defaultFetchState
   },
   showCodeAlly: false,
+  showFreeCodeCampOS: false,
   user: {},
   userFetchState: {
     ...defaultFetchState
@@ -94,6 +96,7 @@ export const sagas = [
   ...createAcceptTermsSaga(actionTypes),
   ...createAppMountSaga(actionTypes),
   ...createCodeAllySaga(actionTypes),
+  ...createFreeCodeCampOSSaga(actionTypes),
   ...createDonationSaga(actionTypes),
   ...createGaSaga(actionTypes),
   ...createFetchUserSaga(actionTypes),
@@ -424,10 +427,22 @@ export const reducer = handleActions(
         showCodeAlly: false
       };
     },
+    [actionTypes.hideFreeCodeCampOS]: state => {
+      return {
+        ...state,
+        showFreeCodeCampOS: false
+      };
+    },
     [actionTypes.showCodeAlly]: state => {
       return {
         ...state,
         showCodeAlly: true
+      };
+    },
+    [actionTypes.showFreeCodeCampOS]: state => {
+      return {
+        ...state,
+        showFreeCodeCampOS: true
       };
     },
     [actionTypes.startExam]: state => {
