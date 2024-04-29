@@ -1455,6 +1455,19 @@
       }
     }
   },
+  "sandpack": {
+    "title": "Sandpack",
+    "intro": ["Do you want to build a sand pack?"],
+    "blocks": {
+      "build-a-pack-of-sand": {
+        "title": "Build a Pack of Sand",
+        "intro": [
+          "This is a sandpack project.",
+          "For this project, you will build a pack of sand."
+        ]
+      }
+    }
+  },
   "rosetta-code": {
     "title": "Rosetta Code",
     "intro": [

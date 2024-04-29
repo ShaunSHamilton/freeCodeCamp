@@ -189,7 +189,8 @@ const SuperBlockIntroductionPage = (props: SuperBlockProp) => {
     SuperBlocks.ProjectEuler,
     SuperBlocks.A2English,
     SuperBlocks.RosettaCode,
-    SuperBlocks.PythonForEverybody
+    SuperBlocks.PythonForEverybody,
+    SuperBlocks.Sandpack
   ];
 
   const onCertificationDonationAlertClick = () => {

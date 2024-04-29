@@ -23,6 +23,7 @@ const python = 20;
 const dialogue = 21;
 const fillInTheBlank = 22;
 const multifilePythonCertProject = 23;
+const sandpack = 24;
 
 export const challengeTypes = {
   html,
@@ -49,7 +50,8 @@ export const challengeTypes = {
   python,
   dialogue,
   fillInTheBlank,
-  multifilePythonCertProject
+  multifilePythonCertProject,
+  sandpack
 };
 
 export const hasNoSolution = (challengeType: number): boolean => {
@@ -101,7 +103,8 @@ export const viewTypes = {
   [python]: 'modern',
   [dialogue]: 'dialogue',
   [fillInTheBlank]: 'fillInTheBlank',
-  [multifilePythonCertProject]: 'classic'
+  [multifilePythonCertProject]: 'classic',
+  [sandpack]: 'sandpack'
 };
 
 // determine the type of submit function to use for the challenge on completion
@@ -132,5 +135,6 @@ export const submitTypes = {
   [python]: 'tests',
   [dialogue]: 'tests',
   [fillInTheBlank]: 'tests',
-  [multifilePythonCertProject]: 'tests'
+  [multifilePythonCertProject]: 'tests',
+  [sandpack]: 'tests'
 };

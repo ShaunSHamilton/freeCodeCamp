@@ -58,6 +58,10 @@ const fillInTheBlank = path.resolve(
   __dirname,
   '../../src/templates/Challenges/fill-in-the-blank/show.tsx'
 );
+const sandpack = path.resolve(
+  __dirname,
+  '../../src/templates/Challenges/sandpack/show.tsx'
+);
 
 const views = {
   backend,
@@ -70,7 +74,8 @@ const views = {
   exam,
   msTrophy,
   dialogue,
-  fillInTheBlank
+  fillInTheBlank,
+  sandpack
   // quiz: Quiz
 };
 
@@ -174,6 +179,7 @@ function getProjectPreviewConfig(challenge, allChallengeEdges) {
       challengeType !== challengeTypes.multifileCertProject &&
       challengeType !== challengeTypes.multifilePythonCertProject &&
       challengeType !== challengeTypes.python &&
+      challengeType !== challengeTypes.sandpack &&
       challengeType !== challengeTypes.js,
     challengeData: {
       challengeType: lastChallenge.challengeType,
