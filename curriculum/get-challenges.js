@@ -18,7 +18,7 @@ const { isAuditedSuperBlock } = require('../shared/utils/is-audited');
 const { createPoly } = require('../shared/utils/polyvinyl');
 const { getSuperOrder, getSuperBlockFromDir } = require('./utils');
 
-const { addDescriptionToChallenge } = require('./capi-connector');
+const { compare_cdb_to_fs } = require('./capi-connector');
 
 const access = util.promisify(fs.access);
 
@@ -319,7 +319,7 @@ function generateChallengeCreator(lang, englishPath, i18nPath) {
     const langUsed = isAudited && fs.existsSync(i18nPath) ? lang : 'english';
 
     const challenge = translateCommentsInChallenge(
-      await parseMD(langUsed === 'english' ? englishPath : i18nPath, langUsed),
+      await parseMD(langUsed === 'english' ? englishPath : i18nPath),
       langUsed,
       COMMENT_TRANSLATIONS
     );
@@ -327,9 +327,11 @@ function generateChallengeCreator(lang, englishPath, i18nPath) {
     addMetaToChallenge(challenge, meta);
     fixChallengeProperties(challenge);
 
-    if (lang === 'english') {
-      await addDescriptionToChallenge(challenge, lang);
-    }
+    // TODO: Should this be awaited?
+    compare_cdb_to_fs({
+      challenge,
+      lang
+    });
 
     return challenge;
   }
