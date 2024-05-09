@@ -12,8 +12,10 @@ async function fetchCapCurriculum() {
 }
 
 function getChallengeFromPath(capCurriculum, englishPath) {
-  return capCurriculum.find(c =>
-    englishPath.endsWith(`${c.block}/${c.objectId}.md`)
+  return capCurriculum.find(
+    c =>
+      englishPath.endsWith(`${c.block}/${c.objectId}.md`) ||
+      englishPath.endsWith(`${c.block}/${c.challengeDashedName}.md`)
   );
 }
 
@@ -21,7 +23,7 @@ function getCapDescription(capCurriculum, englishPath) {
   const challenge = getChallengeFromPath(capCurriculum, englishPath);
 
   return challenge?.description
-    ? `<section section-id="description">${marked(challenge.description)}</section>`
+    ? `<section id="description">${marked(challenge.description)}</section>`
     : '';
 }
 
@@ -29,7 +31,7 @@ function getCapInstructions(capCurriculum, englishPath) {
   const challenge = getChallengeFromPath(capCurriculum, englishPath);
 
   return challenge?.instructions
-    ? `<section section-id="instruction">${marked(challenge.instructions)}</section>`
+    ? `<section id="instruction">${marked(challenge.instructions)}</section>`
     : '';
 }
 
