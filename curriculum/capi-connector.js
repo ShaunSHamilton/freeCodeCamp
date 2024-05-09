@@ -28,7 +28,7 @@ function getCapDescription(capCurriculum, englishPath) {
 function getCapInstructions(capCurriculum, englishPath) {
   const challenge = getChallengeFromPath(capCurriculum, englishPath);
 
-  return challenge?.description
+  return challenge?.instructions
     ? `<section section-id="instruction">${marked(challenge.instructions)}</section>`
     : '';
 }
