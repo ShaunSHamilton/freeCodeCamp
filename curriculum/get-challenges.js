@@ -18,7 +18,11 @@ const { isAuditedSuperBlock } = require('../shared/utils/is-audited');
 const { createPoly } = require('../shared/utils/polyvinyl');
 const { getSuperOrder, getSuperBlockFromDir } = require('./utils');
 
-const { addDescriptionToChallenge } = require('./capi-connector');
+const {
+  getCapDescription,
+  getCapInstructions,
+  fetchCapCurriculum
+} = require('./capi-connector');
 
 const access = util.promisify(fs.access);
 
@@ -134,7 +138,11 @@ const walk = (root, target, options, cb) => {
   });
 };
 
+let capCurriculum;
+
 exports.getChallengesForLang = async function getChallengesForLang(lang) {
+  capCurriculum = await fetchCapCurriculum();
+
   const invalidLang = !curriculumLangs.includes(lang);
   if (invalidLang)
     throw Error(`${lang} is not a accepted language.
@@ -318,18 +326,27 @@ function generateChallengeCreator(lang, englishPath, i18nPath) {
     // If we can use the language, do so. Otherwise, default to english.
     const langUsed = isAudited && fs.existsSync(i18nPath) ? lang : 'english';
 
+    const parsed = await parseMD(
+      langUsed === 'english' ? englishPath : i18nPath,
+      langUsed
+    );
+
+    const newDesciption = getCapDescription(capCurriculum, englishPath);
+    const newInstructions = getCapInstructions(capCurriculum, englishPath);
+
+    if (langUsed === 'english') {
+      parsed.description = newDesciption;
+      parsed.instructions = newInstructions;
+    }
+
     const challenge = translateCommentsInChallenge(
-      await parseMD(langUsed === 'english' ? englishPath : i18nPath, langUsed),
+      parsed,
       langUsed,
       COMMENT_TRANSLATIONS
     );
     challenge.translationPending = lang !== 'english' && !isAudited;
     addMetaToChallenge(challenge, meta);
     fixChallengeProperties(challenge);
-
-    if (lang === 'english') {
-      addDescriptionToChallenge(challenge);
-    }
 
     return challenge;
   }

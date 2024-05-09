@@ -1,40 +1,40 @@
-const marked = require('marked');
+const { marked } = require('marked');
 
-const apiUrl = 'http://localhost:3010';
-
-let curriculum;
-
-async function fetchCurriculum() {
+async function fetchCapCurriculum() {
   try {
-    const response = await fetch(`${apiUrl}/curriculum`);
+    const response = await fetch('http://localhost:3010/curriculum');
     const data = await response.json();
-    curriculum = data;
+    return data;
   } catch (error) {
     console.error('Error fetching curriculum data:', error);
     throw error;
   }
 }
 
-export async function addDescriptionToChallenge(challenge) {
-  if (!curriculum) {
-    await fetchCurriculum();
-  }
-
-  return marked(curriculum.find(c => c.id === challenge.objectId).description);
+function getChallengeFromPath(capCurriculum, englishPath) {
+  return capCurriculum.find(c =>
+    englishPath.endsWith(`${c.block}/${c.objectId}.md`)
+  );
 }
 
-// export async function addDescriptionToChallenge(challenge, lang) {
-//   // throw 'TODO: Call cAPI to get description for challenge.id and lang';
+function getCapDescription(capCurriculum, englishPath) {
+  const challenge = getChallengeFromPath(capCurriculum, englishPath);
 
-//   if (lang !== 'english') {
-//     return;
-//   }
+  return challenge?.description
+    ? `<section section-id="description">${marked(challenge.description)}</section>`
+    : '';
+}
 
-//   const { description } = await fetch(
-//     `https://www.freecodecamp.org/api/challenge/get-description?challengeId=${challenge.id}`
-//   ).then(res => res.json());
+function getCapInstructions(capCurriculum, englishPath) {
+  const challenge = getChallengeFromPath(capCurriculum, englishPath);
 
-//   const htmlDescription = marked(description);
+  return challenge?.description
+    ? `<section section-id="instruction">${marked(challenge.instructions)}</section>`
+    : '';
+}
 
-//   challenge.description = htmlDescription;
-// }
+module.exports = {
+  getCapDescription,
+  getCapInstructions,
+  fetchCapCurriculum
+};

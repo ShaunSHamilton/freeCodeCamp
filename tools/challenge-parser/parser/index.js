@@ -50,17 +50,13 @@ const processor = unified()
   .use(addVideoQuestion)
   .use(addAssignment)
   .use(addScene)
-  .use(addTests);
-// .use(addText, ['description', 'instructions', 'notes']);
+  .use(addTests)
+  .use(addText, ['description', 'instructions', 'notes']);
 
-exports.parseMD = function parseMD(filename, langUsed) {
+exports.parseMD = function parseMD(filename) {
+  // , langUsed) {
   return new Promise((resolve, reject) => {
     const file = readSync(filename);
-    if (langUsed === 'english') {
-      processor.use(addText, ['instructions', 'notes']);
-    } else {
-      processor.use(addText, ['description', 'instructions', 'notes']);
-    }
     const tree = processor.parse(file);
 
     processor.run(tree, file, function (err, node, file) {
