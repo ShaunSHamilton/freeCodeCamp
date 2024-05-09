@@ -328,7 +328,7 @@ function generateChallengeCreator(lang, englishPath, i18nPath) {
     fixChallengeProperties(challenge);
 
     if (lang === 'english') {
-      await addDescriptionToChallenge(challenge, lang);
+      addDescriptionToChallenge(challenge);
     }
 
     return challenge;

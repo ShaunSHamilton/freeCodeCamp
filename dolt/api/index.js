@@ -37,10 +37,43 @@ let curriculumArray = [];
 
 async function fetchCurriculumFromDB() {
   try {
-    // add all from challenges table to `curriculumData`
-    const challenges = await runSQL('SELECT * FROM challenges');
+    // add all challenges with block and superblock info to `curriculumData`
+    // this join a little time, only like 10 seconds - see if refactoring to separate queries speeds it up
+    const challengeQuery = `SELECT
+    c.id,
+    c.title,
+    object_id,
+    c.dashed_name,
+    challenge_order,
+    block_order,
+    b.title AS block_title,
+    b.dashed_name AS block_dashed_name,
+    s.title AS superblock_title,
+    s.dashed_name AS superblock_dashed_name,
+    superblock_order
+  FROM challenges AS c
+  FULL JOIN blocks_challenges AS bc ON c.id = bc.challenge_id
+  FULL JOIN blocks as b ON bc.block_id = b.id
+  FULL JOIN superblocks_blocks as sb ON sb.block_id = b.id
+  FULL JOIN superblocks AS s ON s.id = sb.superblock_id`;
+
+    const challenges = await runSQL(challengeQuery);
     challenges.forEach(challenge => {
-      curriculumData[challenge.id] = { ...challenge };
+      curriculumData[challenge.id] = {
+        id: challenge.id,
+        objectId: challenge.object_id,
+        title: challenge.title,
+        challengeDashedName: challenge.dashed_name,
+        challengeOrder: challenge.challenge_order,
+        block: challenge.block_dashed_name,
+        blockTitle: challenge.block_title,
+        blockDashedName: challenge.block_dashed_name,
+        blockOrder: challenge.block_order,
+        superblock: challenge.superblock_dashed_name,
+        superblockOrder: challenge.superblock_order,
+        superblockTitle: challenge.superblock_title,
+        superblockDashedName: challenge.superblock_dashed_name
+      };
     });
 
     // add all from features tables to `curriculumData`
@@ -71,7 +104,9 @@ async function fetchCurriculumFromDB() {
       });
     }
 
-    // add superblock, block, order, etc
+    // still missing certification? time? translationPending?
+    // boolean tables don't get set to false. I think that can be inferred.
+    // fields isn't added - I don't think we want it - or it can be inferred/created at build?
 
     curriculumArray = Object.values(curriculumData);
   } catch (err) {
@@ -82,8 +117,10 @@ async function fetchCurriculumFromDB() {
 }
 
 fetchCurriculumFromDB();
+// after this, I can just adjust the curriculum array to something I want
 
 app.get('/curriculum', (req, res) => {
+  console.log('Someone is trying to get the curriculum!');
   res.json(curriculumArray);
 });
 
@@ -116,6 +153,7 @@ SELECT s.title AS superblock_title,
 // TODO: Make sure to sanitize data on any endpoints that run a query from input
 
 app.get('/challenge/:object_id', (req, res) => {
+  console.log('Someone is trying to get a challenge!');
   const { object_id } = req.params;
 
   const query = `SELECT * FROM challenges WHERE object_id = ?`;
@@ -164,6 +202,7 @@ app.get('/challenge/:object_id', (req, res) => {
 });
 
 app.get('/superblock/dashed-name/:name', (req, res) => {
+  console.log('Someone is trying to get a superblock!');
   const { name } = req.params;
   const query = `SELECT * FROM superblocks WHERE dashed_name = ?`;
 
