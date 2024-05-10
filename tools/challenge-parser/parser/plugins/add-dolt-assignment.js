@@ -1,6 +1,6 @@
+const { root } = require('mdast-builder');
+const mdastToMarkdown = require('mdast-util-to-markdown');
 const getAllBetween = require('./utils/between-headings');
-
-const mdastToHtml = require('./utils/mdast-to-html');
 const { splitOnThematicBreak } = require('./utils/split-on-thematic-break');
 
 function plugin() {
@@ -17,7 +17,9 @@ function plugin() {
   function getAssignments(assignmentNodes) {
     const assignmentGroups = splitOnThematicBreak(assignmentNodes);
 
-    return assignmentGroups.map(assignment => mdastToHtml(assignment));
+    return assignmentGroups.map(assignment =>
+      mdastToMarkdown(root(assignment)).trim()
+    );
   }
 }
 

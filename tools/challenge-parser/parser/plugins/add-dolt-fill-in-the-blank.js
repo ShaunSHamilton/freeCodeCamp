@@ -1,9 +1,9 @@
 const { root } = require('mdast-builder');
 const find = require('unist-util-find');
 const visit = require('unist-util-visit');
+const mdastToMarkdown = require('mdast-util-to-markdown');
 const getAllBetween = require('./utils/between-headings');
 const getAllBefore = require('./utils/before-heading');
-const mdastToHtml = require('./utils/mdast-to-html');
 
 const { splitOnThematicBreak } = require('./utils/split-on-thematic-break');
 
@@ -75,7 +75,9 @@ function getfillInTheBlank(sentenceNodes, blanksNodes) {
     const children = node.children.map(child => ({ ...child, type: 'text' }));
     return { ...node, children };
   });
-  const sentence = mdastToHtml(sentenceWithoutCodeBlocks);
+  const sentence = mdastToMarkdown(root(sentenceWithoutCodeBlocks))
+    .replaceAll('\\', '')
+    .trim();
   const blanks = getBlanks(blanksNodes);
 
   if (!sentence) throw Error('sentence is missing from fill in the blank');
@@ -101,7 +103,7 @@ function getBlanks(blanksNodes) {
 
       return {
         answer: blanksNodes[0].children[0].value,
-        feedback: mdastToHtml(feedbackNodes)
+        feedback: mdastToMarkdown(root(feedbackNodes)).trim()
       };
     }
 

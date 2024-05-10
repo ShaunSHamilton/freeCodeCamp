@@ -1,6 +1,7 @@
+const { root } = require('mdast-builder');
 const chunk = require('lodash/chunk');
+const mdastToMarkdown = require('mdast-util-to-markdown');
 const getAllBetween = require('./utils/between-headings');
-const mdastToHtml = require('./utils/mdast-to-html');
 
 function plugin() {
   return transformer;
@@ -17,7 +18,7 @@ function plugin() {
 
 function getTest(hintNodes) {
   const [textNode, testStringNode] = hintNodes;
-  const text = mdastToHtml([textNode]);
+  const text = mdastToMarkdown(root([textNode])).trim();
   const testString = testStringNode.value;
 
   if (!text) throw Error('text is missing from hint');

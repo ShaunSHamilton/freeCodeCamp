@@ -1,8 +1,8 @@
 const { root } = require('mdast-builder');
 const find = require('unist-util-find');
+const mdastToMarkdown = require('mdast-util-to-markdown');
 const getAllBetween = require('./utils/between-headings');
 const getAllBefore = require('./utils/before-heading');
-const mdastToHtml = require('./utils/mdast-to-html');
 
 const { splitOnThematicBreak } = require('./utils/split-on-thematic-break');
 
@@ -25,7 +25,7 @@ function plugin() {
 }
 
 function getQuestion(textNodes, answersNodes, solutionNodes) {
-  const text = mdastToHtml(textNodes);
+  const text = mdastToMarkdown(root(textNodes)).trim();
   const answers = getAnswers(answersNodes);
   const solution = getSolution(solutionNodes);
 
@@ -52,12 +52,15 @@ function getAnswers(answersNodes) {
       }
 
       return {
-        answer: mdastToHtml(answerNodes),
-        feedback: mdastToHtml(feedbackNodes)
+        answer: mdastToMarkdown(root(answerNodes)).trim(),
+        feedback: mdastToMarkdown(root(feedbackNodes)).trim()
       };
     }
 
-    return { answer: mdastToHtml(answerGroup), feedback: null };
+    return {
+      answer: mdastToMarkdown(root(answerGroup)).trim(),
+      feedback: null
+    };
   });
 }
 
