@@ -1,8 +1,13 @@
-// const directive = require('remark-directive');
+const directive = require('remark-directive');
 const frontmatter = require('remark-frontmatter');
 const remark = require('remark-parse');
 const { readSync } = require('to-vfile');
 const unified = require('unified');
+const addDoltAssignment = require('./plugins/add-dolt-assignment');
+const addDoltFillInTheBlank = require('./plugins/add-dolt-fill-in-the-blank');
+const addDoltTests = require('./plugins/add-dolt-tests');
+const addDoltText = require('./plugins/add-dolt-text');
+const addDoltVideoQuestion = require('./plugins/add-dolt-video-question');
 const addFillInTheBlank = require('./plugins/add-fill-in-the-blank');
 const addFrontmatter = require('./plugins/add-frontmatter');
 const addSeed = require('./plugins/add-seed');
@@ -13,48 +18,68 @@ const addVideoQuestion = require('./plugins/add-video-question');
 const addAssignment = require('./plugins/add-assignment');
 const replaceImports = require('./plugins/replace-imports');
 const restoreDirectives = require('./plugins/restore-directives');
-// const tableAndStrikeThrough = require('./plugins/table-and-strikethrough');
+const tableAndStrikeThrough = require('./plugins/table-and-strikethrough');
 const addScene = require('./plugins/add-scene');
 
-// by convention, anything that adds to file.data has the name add<name>.
-const processor = unified()
-  // add the remark parser
-  .use(remark)
-  // modify the parser so that Github flavour tables and strikethroughs get
-  // converted to 'delete' nodes
-  // .use(tableAndStrikeThrough)
-  // directives are parsed into 'leafDirective' nodes and used for imports
-  // .use(directive)
-  // convert the text at the top of the document (surrounded by ---) into a
-  // 'yaml' node
-  .use(frontmatter, ['yaml'])
-  // extract the content from that 'yaml' node
-  .use(addFrontmatter)
-  // Any imports will be replaced (in the tree) with
-  // the sub-tree of the target file. e.g.
-  // ::import{component="Script" from="./file.path" }
-  // means that file.path's tree will be inserted wherever
-  // ::use{component="Script"}
-  // appears.
-  .use(replaceImports)
-  // the final five 'add' plugins insert content into file.data
-  // TODO: rename test->hint everywhere? It should make things easier to reason
-  // about.
-  .use(addSeed)
-  .use(addSolution)
-  // the directives will have been parsed and used by this point, any remaining
-  // 'directives' will be from text like the css selector :root. These should be
-  // converted back to text before they're added to the challenge object.
-  .use(restoreDirectives)
-  .use(addFillInTheBlank)
-  .use(addVideoQuestion)
-  .use(addAssignment)
-  .use(addScene)
-  .use(addTests)
-  .use(addText, ['description', 'instructions', 'notes']);
+// set this to true to parse the challenges for seeding the dolt database
+const parseForSeedingDoltDb = true;
+let processor;
+
+if (parseForSeedingDoltDb) {
+  processor = unified()
+    .use(remark)
+    .use(frontmatter, ['yaml'])
+    .use(addFrontmatter)
+    .use(replaceImports)
+    .use(addSeed)
+    .use(addSolution)
+    .use(restoreDirectives)
+    .use(addDoltFillInTheBlank)
+    .use(addDoltVideoQuestion)
+    .use(addDoltAssignment)
+    .use(addScene)
+    .use(addDoltTests)
+    .use(addDoltText, ['description', 'instructions', 'notes']);
+} else {
+  // by convention, anything that adds to file.data has the name add<name>.
+  processor = unified()
+    // add the remark parser
+    .use(remark)
+    // modify the parser so that Github flavour tables and strikethroughs get
+    // converted to 'delete' nodes
+    .use(tableAndStrikeThrough)
+    // directives are parsed into 'leafDirective' nodes and used for imports
+    .use(directive)
+    // convert the text at the top of the document (surrounded by ---) into a
+    // 'yaml' node
+    .use(frontmatter, ['yaml'])
+    // extract the content from that 'yaml' node
+    .use(addFrontmatter)
+    // Any imports will be replaced (in the tree) with
+    // the sub-tree of the target file. e.g.
+    // ::import{component="Script" from="./file.path" }
+    // means that file.path's tree will be inserted wherever
+    // ::use{component="Script"}
+    // appears.
+    .use(replaceImports)
+    // the final five 'add' plugins insert content into file.data
+    // TODO: rename test->hint everywhere? It should make things easier to reason
+    // about.
+    .use(addSeed)
+    .use(addSolution)
+    // the directives will have been parsed and used by this point, any remaining
+    // 'directives' will be from text like the css selector :root. These should be
+    // converted back to text before they're added to the challenge object.
+    .use(restoreDirectives)
+    .use(addFillInTheBlank)
+    .use(addVideoQuestion)
+    .use(addAssignment)
+    .use(addScene)
+    .use(addTests)
+    .use(addText, ['description', 'instructions', 'notes']);
+}
 
 exports.parseMD = function parseMD(filename) {
-  // , langUsed) {
   return new Promise((resolve, reject) => {
     const file = readSync(filename);
     const tree = processor.parse(file);
