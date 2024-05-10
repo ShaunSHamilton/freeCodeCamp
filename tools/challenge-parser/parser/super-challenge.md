@@ -37,16 +37,16 @@ url: freeCodeCamp/learn-celestial-bodies-database
 You've likely seen an `alt` attribute on an `img` tag in other challenges. `alt` text describes the image's content and provides a text-alternative for it. An `alt` attribute helps in cases where the image fails to load or can't be seen by a user. Search engines also use it to understand what an image contains to include it in search results. Here's an example:
 
 ```html
-<img src="importantLogo.jpeg" alt="Company logo" />
+<img src="importantLogo.jpeg" alt="Company logo">
 ```
 
-| n   | Gaussian integer divisors with positive real part | Sum s(n) of these divisors |
-| --- | ------------------------------------------------- | -------------------------- |
-| 1   | 1                                                 | 1                          |
-| 2   | 1, 1 + i, 1 - i, 2                                | 5                          |
-| 3   | 1, 3                                              | 4                          |
-| 4   | 1, 1 + i, 1 - i, 2, 2 + 2i, 2 - 2i, 4             | 13                         |
-| 5   | 1, 1 + 2i, 1 - 2i, 2 + i, 2 - i, 5                | 12                         |
+| n | Gaussian integer divisors with positive real part | Sum s(n) of these divisors |
+|---|---------------------------------------------------|----------------------------|
+| 1 | 1                                                 | 1                          |
+| 2 | 1, 1 + i, 1 - i, 2                                | 5                          |
+| 3 | 1, 3                                              | 4                          |
+| 4 | 1, 1 + i, 1 - i, 2, 2 + 2i, 2 - 2i, 4             | 13                         |
+| 5 | 1, 1 + 2i, 1 - 2i, 2 + i, 2 - i, 5                | 12                         |
 
 More resources:
 
@@ -68,19 +68,13 @@ Required files: `worldcup.sql`, `insert_data.sh`, `queries.sh`
 You should use `document.getElementById()` to get the `#author-container` element.
 
 ```js
-assert.match(
-  code,
-  /document\.getElementById\(\s*('|"|`)author\-container\1\s*\)/
-);
+assert.match(code, /document\.getElementById\(\s*('|"|`)author\-container\1\s*\)/);
 ```
 
 You should assign the `#author-container` element to the variable `authorContainer`. Don't forget to use `const` to declare the variable.
 
 ```js
-assert.match(
-  code,
-  /const\s+authorContainer\s*\=\s*document\.getElementById\(\s*('|"|`)author\-container\1\s*\)/
-);
+assert.match(code, /const\s+authorContainer\s*\=\s*document\.getElementById\(\s*('|"|`)author\-container\1\s*\)/);
 ```
 
 # --assignment--
@@ -378,7 +372,7 @@ You're looking for the main verb `do` to inquire about her job activities
 ## --seed-contents--
 
 ```html
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -484,14 +478,13 @@ let endingIndex = 8;
 let authorDataArr = [];
 
 fetch('https://cdn.freecodecamp.org/curriculum/news-author-page/authors.json')
-  .then(res => res.json())
-  .then(data => {
+  .then((res) => res.json())
+  .then((data) => {
     authorDataArr = data;
-    displayAuthors(authorDataArr.slice(startingIndex, endingIndex));
+    displayAuthors(authorDataArr.slice(startingIndex, endingIndex));  
   })
-  .catch(err => {
-    authorContainer.innerHTML =
-      '<p class="error-msg">There was an error loading the authors</p>';
+  .catch((err) => {
+   authorContainer.innerHTML = '<p class="error-msg">There was an error loading the authors</p>';
   });
 
 const fetchMoreAuthors = () => {
@@ -501,14 +494,14 @@ const fetchMoreAuthors = () => {
   displayAuthors(authorDataArr.slice(startingIndex, endingIndex));
   if (authorDataArr.length <= endingIndex) {
     loadMoreBtn.disabled = true;
-    --fcc - editable - region--;
+    --fcc-editable-region--
 
-    --fcc - editable - region--;
+    --fcc-editable-region--
     loadMoreBtn.textContent = 'No more data to load';
   }
 };
 
-const displayAuthors = authors => {
+const displayAuthors = (authors) => {
   authors.forEach(({ author, image, url, bio }, index) => {
     authorContainer.innerHTML += `
     <div id="${index}" class="user-card">
@@ -528,7 +521,7 @@ loadMoreBtn.addEventListener('click', fetchMoreAuthors);
 # --solutions--
 
 ```html
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -634,14 +627,13 @@ let endingIndex = 8;
 let authorDataArr = [];
 
 fetch('https://cdn.freecodecamp.org/curriculum/news-author-page/authors.json')
-  .then(res => res.json())
-  .then(data => {
+  .then((res) => res.json())
+  .then((data) => {
     authorDataArr = data;
-    displayAuthors(authorDataArr.slice(startingIndex, endingIndex));
+    displayAuthors(authorDataArr.slice(startingIndex, endingIndex));  
   })
-  .catch(err => {
-    authorContainer.innerHTML =
-      '<p class="error-msg">There was an error loading the authors</p>';
+  .catch((err) => {
+   authorContainer.innerHTML = '<p class="error-msg">There was an error loading the authors</p>';
   });
 
 const fetchMoreAuthors = () => {
@@ -651,12 +643,12 @@ const fetchMoreAuthors = () => {
   displayAuthors(authorDataArr.slice(startingIndex, endingIndex));
   if (authorDataArr.length <= endingIndex) {
     loadMoreBtn.disabled = true;
-    loadMoreBtn.style.cursor = 'not-allowed';
+    loadMoreBtn.style.cursor = "not-allowed"
     loadMoreBtn.textContent = 'No more data to load';
   }
 };
 
-const displayAuthors = authors => {
+const displayAuthors = (authors) => {
   authors.forEach(({ author, image, url, bio }, index) => {
     authorContainer.innerHTML += `
     <div id="${index}" class="user-card">
