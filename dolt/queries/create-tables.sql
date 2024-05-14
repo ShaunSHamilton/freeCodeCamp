@@ -73,6 +73,14 @@ CREATE TABLE IF NOT EXISTS block_time_to_complete(
 )
 
 
+  CREATE TABLE IF NOT EXISTS block_is_upcoming(
+    id INT NOT NULL AUTO_INCREMENT,
+    block_id INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (block_id) REFERENCES blocks(id)
+  )
+
+
 CREATE TABLE IF NOT EXISTS app_url(
   id INT AUTO_INCREMENT,
   challenge_id INT NOT NULL,

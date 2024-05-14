@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS app_url;
 DROP TABLE IF EXISTS assignments;
 DROP TABLE IF EXISTS audio_path;
 DROP TABLE IF EXISTS bilibili_ids;
+DROP TABLE IF EXISTS block_is_upcoming;
 DROP TABLE IF EXISTS block_time_to_complete;
 DROP TABLE IF EXISTS blocks_challenges;
 DROP TABLE IF EXISTS certifications_prerequisites;

@@ -7,6 +7,7 @@ import {
 } from './utils.js';
 import { challengeTypeToTablesMap } from './challenge-type-to-tables-map.js';
 import { getSuperblockTitle, getBlockTitle } from './dashed-names-to-titles.js';
+import { getBlockIsUpcoming } from './block-is-upcoming.js';
 
 export async function withConnection(connectionString, callback) {
   const connection = createConnection(connectionString);
@@ -95,6 +96,15 @@ CREATE TABLE IF NOT EXISTS block_time_to_complete(
   PRIMARY KEY (id),
   FOREIGN KEY (block_id) REFERENCES blocks(id)
 )`;
+  await runCreateTable(connection, sql);
+
+  sql = `
+  CREATE TABLE IF NOT EXISTS block_is_upcoming(
+    id INT NOT NULL AUTO_INCREMENT,
+    block_id INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (block_id) REFERENCES blocks(id)
+  )`;
   await runCreateTable(connection, sql);
 
   // Additional feature tables to replace challengeTypes
@@ -304,13 +314,18 @@ export async function addChallenges(connection, data) {
       blockSet.add(block);
       block_to_block_id_map.set(block, block_id);
 
-      // Add `block_time_to_complete` as special case, because it is per-block
+      // Add `block_time_to_complete` and `block_is_upcoming` as special case, because it is per-block
       await insert(
         connection,
         'block_time_to_complete',
         ['block_id', 'time_to_complete'],
         [block_id, time]
       );
+
+      const blockIsUpcoming = getBlockIsUpcoming(block);
+      if (blockIsUpcoming) {
+        await insert(connection, 'block_is_upcoming', ['block_id'], [block_id]);
+      }
 
       const superblockId = superblock_to_superblock_id_map.get(superBlock);
       await insert(
