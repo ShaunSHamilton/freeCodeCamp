@@ -1,33 +1,41 @@
 import { challengeTypes } from '../shared/config/challenge-types.js';
 import { insert } from './utils.js';
 
+const ids = {
+  app_url: 1,
+  source_code_url: 1,
+  local_address_allowed: 1,
+  editor_address_allowed: 1,
+  display_preview_modal: 1
+};
+
 const app_url = required => async (connection, challenge) =>
   await insert(
     connection,
     'app_url',
-    ['challenge_id', 'required'],
-    [challenge.id, required]
+    ['id', 'challenge_id', 'required'],
+    [ids.app_url++, challenge.id, required]
   );
 const source_code_url = required => async (connection, challenge) =>
   await insert(
     connection,
     'source_code_url',
-    ['challenge_id', 'required'],
-    [challenge.id, required]
+    ['id', 'challenge_id', 'required'],
+    [ids.source_code_url++, challenge.id, required]
   );
 const local_address_allowed = async (connection, challenge) =>
   await insert(
     connection,
     'local_address_allowed',
-    ['challenge_id'],
-    [challenge.id]
+    ['id', 'challenge_id'],
+    [ids.local_address_allowed++, challenge.id]
   );
 const editor_address_allowed = async (connection, challenge) =>
   await insert(
     connection,
     'editor_address_allowed',
-    ['challenge_id'],
-    [challenge.id]
+    ['id', 'challenge_id'],
+    [ids.editor_address_allowed++, challenge.id]
   );
 
 const display_preview_modal = async (connection, challenge) => {
@@ -39,8 +47,8 @@ const display_preview_modal = async (connection, challenge) => {
     await insert(
       connection,
       'display_preview_modal',
-      ['challenge_id'],
-      [challenge.id]
+      ['id', 'challenge_id'],
+      [ids.display_preview_modal++, challenge.id]
     );
   }
 };

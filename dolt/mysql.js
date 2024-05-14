@@ -262,6 +262,7 @@ export async function addChallenges(connection, data) {
   const feature_table_ids = {};
   let block_id = 1;
   let superblock_id = 1;
+  let block_is_upcoming_id = 1;
   let c = 1;
 
   for (const challengeNode of data) {
@@ -318,13 +319,18 @@ export async function addChallenges(connection, data) {
       await insert(
         connection,
         'block_time_to_complete',
-        ['block_id', 'time_to_complete'],
-        [block_id, time]
+        ['id', 'block_id', 'time_to_complete'],
+        [block_id, block_id, time]
       );
 
       const blockIsUpcoming = getBlockIsUpcoming(block);
       if (blockIsUpcoming) {
-        await insert(connection, 'block_is_upcoming', ['block_id'], [block_id]);
+        await insert(
+          connection,
+          'block_is_upcoming',
+          ['id', 'block_id'],
+          [block_is_upcoming_id++, block_id]
+        );
       }
 
       const superblockId = superblock_to_superblock_id_map.get(superBlock);
