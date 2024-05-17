@@ -123,6 +123,14 @@ CREATE TABLE IF NOT EXISTS display_preview_modal(
 );
 
 
+  CREATE TABLE IF NOT EXISTS uses_multifile_editor(
+    id INT AUTO_INCREMENT,
+    challenge_id INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (challenge_id) REFERENCES challenges(id)
+  );
+
+
 CREATE TABLE IF NOT EXISTS assignments (
   id INT NOT NULL AUTO_INCREMENT,
   challenge_id INT NOT NULL,

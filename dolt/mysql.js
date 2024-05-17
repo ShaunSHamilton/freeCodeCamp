@@ -6,8 +6,11 @@ import {
   insert
 } from './utils.js';
 import { challengeTypeToTablesMap } from './challenge-type-to-tables-map.js';
-import { getSuperblockTitle, getBlockTitle } from './dashed-names-to-titles.js';
-import { getBlockIsUpcoming } from './block-is-upcoming.js';
+import { getSuperblockTitle, getBlockTitle } from './intro-dot-json-info.js';
+import {
+  getBlockIsUpcoming,
+  getUsesMultifileEditor
+} from './meta-dot-json-info.js';
 
 export async function withConnection(connectionString, callback) {
   const connection = createConnection(connectionString);
@@ -154,6 +157,15 @@ CREATE TABLE IF NOT EXISTS display_preview_modal(
   FOREIGN KEY (challenge_id) REFERENCES challenges(id)
 );`;
   await runCreateTable(connection, sql);
+
+  sql = `
+  CREATE TABLE IF NOT EXISTS uses_multifile_editor(
+    id INT AUTO_INCREMENT,
+    challenge_id INT NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (challenge_id) REFERENCES challenges(id)
+  );`;
+  await runCreateTable(connection, sql);
 }
 
 export async function createTables(connection, data) {
@@ -263,6 +275,7 @@ export async function addChallenges(connection, data) {
   let block_id = 1;
   let superblock_id = 1;
   let block_is_upcoming_id = 1;
+  let uses_multifile_editor_id = 1;
   let c = 1;
 
   for (const challengeNode of data) {
@@ -323,8 +336,7 @@ export async function addChallenges(connection, data) {
         [block_id, block_id, time]
       );
 
-      const blockIsUpcoming = getBlockIsUpcoming(block);
-      if (blockIsUpcoming) {
+      if (getBlockIsUpcoming(block)) {
         await insert(
           connection,
           'block_is_upcoming',
@@ -405,6 +417,19 @@ export async function addChallenges(connection, data) {
         );
       }
     }
+
+    if (getUsesMultifileEditor(block)) {
+      console.log(
+        `inserting into uses_multifile_editor: ${uses_multifile_editor_id} | ${c}`
+      );
+      await insert(
+        connection,
+        'uses_multifile_editor',
+        ['id', 'challenge_id'],
+        [uses_multifile_editor_id++, c]
+      );
+    }
+
     c += 1;
   }
 }
