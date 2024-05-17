@@ -419,9 +419,6 @@ export async function addChallenges(connection, data) {
     }
 
     if (getUsesMultifileEditor(block)) {
-      console.log(
-        `inserting into uses_multifile_editor: ${uses_multifile_editor_id} | ${c}`
-      );
       await insert(
         connection,
         'uses_multifile_editor',
