@@ -22,7 +22,7 @@ const tableAndStrikeThrough = require('./plugins/table-and-strikethrough');
 const addScene = require('./plugins/add-scene');
 
 // set this to true to parse the challenges for seeding the dolt database
-const parseForSeedingDoltDb = true;
+const parseForSeedingDoltDb = false;
 let processor;
 
 if (parseForSeedingDoltDb) {

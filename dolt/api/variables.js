@@ -6,6 +6,7 @@ const tables = {
   bilibili_ids: 'bilibili_ids',
   block_time_to_complete: 'block_time_to_complete',
   blocks_challenges: 'blocks_challenges',
+  block_is_upcoming_change: 'block_is_upcoming_change',
   certifications_prerequisites: 'certifications_prerequisites',
   challenge_files: 'challenge_files',
   challenge_type: 'challenge_type',
@@ -32,6 +33,7 @@ const tables = {
   template: 'template',
   tests: 'tests',
   title: 'title',
+  uses_multifile_editor: 'uses_multifile_editor',
   video_id: 'video_id',
   video_locale_ids: 'video_locale_ids',
   video_url: 'video_url',
@@ -41,37 +43,38 @@ const tables = {
   superblocks: 'superblocks'
 };
 
-// challenge feature tables with an identifying column in the table
+// challenge feature tables with an identifying column in the table,
+// column name in that table on the right
 export const featureTablesWithColumns = {
-  [tables.assignments]: ['assignments'],
-  [tables.audio_path]: ['audioPath'],
-  [tables.bilibili_ids]: ['bilibiliIds'],
+  [tables.assignments]: 'assignments',
+  [tables.audio_path]: 'audioPath',
+  [tables.bilibili_ids]: 'bilibiliIds',
   // [tables.block_time_to_complete]: [],
   // [tables.blocks_challenges]: [],
   // [tables.certifications_prerequisites]: [],
-  [tables.challenge_files]: ['challengeFiles'],
-  [tables.challenge_type]: ['challengeType'],
-  [tables.course_url]: ['course_url'],
-  [tables.descriptions]: ['descriptions'],
-  [tables.fill_in_the_blank]: ['fillInTheBlank'],
-  [tables.forum_topic_id]: ['forumTopicId'],
-  [tables.help_category]: ['helpCategory'],
-  [tables.instructions]: ['instructions'],
+  [tables.challenge_files]: 'challengeFiles',
+  [tables.challenge_type]: 'challengeType',
+  [tables.course_url]: 'course_url',
+  [tables.descriptions]: 'descriptions',
+  [tables.fill_in_the_blank]: 'fillInTheBlank',
+  [tables.forum_topic_id]: 'forumTopicId',
+  [tables.help_category]: 'helpCategory',
+  [tables.instructions]: 'instructions',
   // [tables.local_address_allowed]: [],
-  [tables.ms_trophy_id]: ['msTrophyId'],
-  [tables.notes]: ['notes'],
-  [tables.prerequisites]: ['prerequisites'],
-  [tables.question]: ['question'],
-  [tables.required_resources]: ['required_resources'],
-  [tables.scene]: ['scene'],
-  [tables.solutions]: ['solutions'],
+  [tables.ms_trophy_id]: 'msTrophyId',
+  [tables.notes]: 'notes',
+  [tables.prerequisites]: 'prerequisites',
+  [tables.question]: 'question',
+  [tables.required_resources]: 'required_resources',
+  [tables.scene]: 'scene',
+  [tables.solutions]: 'solutions',
   // [tables.superblocks_blocks]: [],
-  [tables.template]: ['template'],
-  [tables.tests]: ['tests'],
-  [tables.title]: ['title'],
-  [tables.video_id]: ['videoId'],
-  [tables.video_locale_ids]: ['videoLocaleIds'],
-  [tables.video_url]: ['videoUrl']
+  [tables.template]: 'template',
+  [tables.tests]: 'tests',
+  [tables.title]: 'title',
+  [tables.video_id]: 'videoId',
+  [tables.video_locale_ids]: 'videoLocaleIds',
+  [tables.video_url]: 'videoUrl'
   // [tables.challenges]: [],
   // [tables.blocks]: [],
   // [tables.certifications]: [],
@@ -91,7 +94,8 @@ export const booleanFeatureTables = {
   [tables.disable_loop_protect_tests]: 'disableLoopProtectTests',
   [tables.display_preview_modal]: 'displayPreviewModal',
   [tables.editor_address_allowed]: 'editorAddressAllowed',
-  [tables.local_address_allowed]: 'localAddressAllowed'
+  [tables.local_address_allowed]: 'localAddressAllowed',
+  [tables.uses_multifile_editor]: 'usesMultifileEditor'
 };
 
 // should probably track the columns instead, but this works for now
@@ -119,5 +123,6 @@ export const columnsToGraphqlName = {
   challenge_files: 'challengeFiles',
   fill_in_the_blank: 'fillInTheBlank',
   prerequisites: 'prerequisites',
+  required_resources: 'required',
   question: 'question'
 };

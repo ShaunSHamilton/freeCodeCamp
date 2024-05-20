@@ -1,4 +1,6 @@
 import express from 'express';
+// uncomment if you want to write the curriculum.json file below
+// import { writeFileSync } from 'fs';
 import { createConnection } from 'mysql';
 import {
   booleanFeatureTables,
@@ -32,96 +34,193 @@ async function runSQL(sql, values = []) {
   });
 }
 
-let curriculumData = {};
-let curriculumArray = [];
+let challengesData = {};
+let challengesArray = [];
+let curriculum = {};
 
 async function fetchCurriculumFromDB() {
+  console.log('Fetching challenge data from database...');
   try {
-    // add all challenges with block and superblock info to `curriculumData`
-    // this join a little time, only like 10 seconds - see if refactoring to separate queries speeds it up
-    const challengeQuery = `SELECT
+    // add all challenges with block and superblock info to `challengesData`
+    // this join adds a little time, only like 10 seconds - see if refactoring to separate queries speeds it up
+    const challengesQuery = `SELECT
     c.id,
     c.title,
-    object_id,
-    c.dashed_name,
-    challenge_order,
-    block_order,
-    b.title AS block_title,
-    b.dashed_name AS block_dashed_name,
-    s.title AS superblock_title,
-    s.dashed_name AS superblock_dashed_name,
-    superblock_order
+    object_id AS objectId,
+    c.dashed_name AS dashedName,
+    challenge_order AS challengeOrder,
+    b.id AS blockId,
+    b.title AS blockTitle,
+    b.dashed_name AS blockDashedName,
+    bt.time_to_complete AS blockTimeToComplete,
+    block_order AS blockOrder,
+    s.title AS superblockTitle,
+    s.dashed_name AS superblockDashedName,
+    superblock_order AS superblockOrder
   FROM challenges AS c
   FULL JOIN blocks_challenges AS bc ON c.id = bc.challenge_id
   FULL JOIN blocks as b ON bc.block_id = b.id
+  FULL JOIN block_time_to_complete AS bt ON bt.block_id = b.id
   FULL JOIN superblocks_blocks as sb ON sb.block_id = b.id
-  FULL JOIN superblocks AS s ON s.id = sb.superblock_id`;
+  FULL JOIN superblocks AS s ON s.id = sb.superblock_id;`;
 
-    const challenges = await runSQL(challengeQuery);
+    const challenges = await runSQL(challengesQuery);
+
     challenges.forEach(challenge => {
-      curriculumData[challenge.id] = {
-        id: challenge.id,
-        objectId: challenge.object_id,
-        title: challenge.title,
-        challengeDashedName: challenge.dashed_name,
-        challengeOrder: challenge.challenge_order,
-        block: challenge.block_dashed_name,
-        blockTitle: challenge.block_title,
-        blockDashedName: challenge.block_dashed_name,
-        blockOrder: challenge.block_order,
-        superblock: challenge.superblock_dashed_name,
-        superblockOrder: challenge.superblock_order,
-        superblockTitle: challenge.superblock_title,
-        superblockDashedName: challenge.superblock_dashed_name
-      };
+      challengesData[challenge.id] = challenge;
     });
 
-    // add all from features tables to `curriculumData`
+    // add all from features tables to `challengesData`
     for (const table of Object.keys(featureTablesWithColumns)) {
-      const tableColumns = featureTablesWithColumns[table];
       const challenges = await runSQL(`SELECT * FROM ${table}`);
 
       challenges.forEach(challenge => {
-        tableColumns.forEach(column => {
-          // name our learn client expects
-          const graphQlName = columnsToGraphqlName[column] || column;
+        const column = featureTablesWithColumns[table];
+        // name our learn client expects
+        const graphQlName = columnsToGraphqlName[column] || column;
 
-          curriculumData[challenge.challenge_id][graphQlName] = maybeJson(
-            table,
-            challenge[column]
-          );
-        });
+        challengesData[challenge.challenge_id][graphQlName] = maybeJson(
+          table,
+          challenge[column]
+        );
       });
     }
 
-    // add all boolean tables to `curriculumData`
+    // add all boolean tables to `challengesData`
     for (const table of Object.keys(booleanFeatureTables)) {
       const challenges = await runSQL(`SELECT challenge_id FROM ${table}`);
 
       challenges.forEach(challenge => {
-        curriculumData[challenge.challenge_id][booleanFeatureTables[table]] =
+        challengesData[challenge.challenge_id][booleanFeatureTables[table]] =
           true;
       });
     }
 
-    // still missing certification? time? translationPending?
-    // boolean tables don't get set to false. I think that can be inferred.
-    // fields isn't added - I don't think we want it - or it can be inferred/created at build?
+    // still missing certification? inferred based on superblock in client
+    // translationPending?
 
-    curriculumArray = Object.values(curriculumData);
+    challengesArray = Object.values(challengesData);
+
+    // Below this, we take the challengesArray and create the curriculum object in the
+    // way the two clients need. It creates the return of getChallengesForLang('english')
+    // Still need to add "certifications" to the curriculum object
+    const upcomingBlockIdsQuery = await runSQL(
+      'SELECT block_id FROM block_is_upcoming'
+    );
+    const upcomingBlockIds = upcomingBlockIdsQuery.map(
+      ({ block_id }) => block_id
+    );
+
+    for (const challenge of challengesArray) {
+      const {
+        objectId,
+        title,
+        challengeFiles = [],
+        challengeOrder,
+        blockId,
+        blockTitle,
+        blockDashedName,
+        blockOrder,
+        superblockDashedName,
+        blockTimeToComplete = '',
+        required = [],
+        template = '',
+        helpCategory = ''
+      } = challenge;
+
+      // create superblock if it doesn't exist
+      if (!curriculum[superblockDashedName]) {
+        curriculum[superblockDashedName] = {
+          blocks: {}
+        };
+      }
+
+      // create block if it doesn't exist
+      if (!curriculum[superblockDashedName].blocks[blockDashedName]) {
+        curriculum[superblockDashedName].blocks[blockDashedName] = {
+          meta: {
+            name: blockTitle,
+            isUpcomingChange: upcomingBlockIds.includes(blockId),
+            dashedName: blockDashedName,
+            helpCategory: helpCategory,
+            order: blockOrder,
+            time: blockTimeToComplete,
+            template,
+            required,
+            superBlock: superblockDashedName,
+            challengeOrder: [],
+            ...(challenge.disableLoopProtectTests && {
+              disableLoopProtectTests: true
+            }),
+            ...(challenge.disableLoopProtectPreview && {
+              disableLoopProtectPreview: true
+            }),
+            ...(challenge.usesMultifileEditor && { usesMultifileEditor: true })
+          },
+          challenges: []
+        };
+      }
+
+      // if any challenge hasEditableBoundaries, add hasEditableBoundaries: true to its block meta
+      const hasEditableBoundaries = challengeFiles.some(
+        cf => cf.editableRegionBoundaries?.length > 0
+      );
+
+      if (hasEditableBoundaries) {
+        curriculum[superblockDashedName].blocks[
+          blockDashedName
+        ].meta.hasEditableBoundaries = true;
+      }
+
+      // for each challenge, push to their block.challenges
+      // TODO: markdownize values that need it
+      // TODO: adjust key names, e.g. blockDashedName -> block
+      curriculum[superblockDashedName].blocks[blockDashedName].challenges.push(
+        challenge
+      );
+
+      // for each challenge, push to meta.challengeOrder
+      curriculum[superblockDashedName].blocks[
+        blockDashedName
+      ].meta.challengeOrder[challengeOrder] = {
+        id: objectId,
+        title
+      };
+    }
+
+    // remove nulls from challengeOrder - this is just for the curriculum.test.js
+    // can remove once https://github.com/freeCodeCamp/freeCodeCamp/pull/54802 is in and on this branch
+    const superblockKeys = Object.keys(curriculum);
+    superblockKeys.forEach(superblockKey => {
+      const blockKeys = Object.keys(curriculum[superblockKey].blocks);
+      blockKeys.forEach(blockKey => {
+        curriculum[superblockKey].blocks[blockKey].meta.challengeOrder =
+          curriculum[superblockKey].blocks[blockKey].meta.challengeOrder.filter(
+            Boolean
+          );
+      });
+    });
+
+    // uncomment to write curriculum.json file
+    // writeFileSync(`./curriculum.json`, JSON.stringify(curriculum, null, 2));
+    // console.log('Curriculum written to file');
   } catch (err) {
     console.error(err);
   }
 
-  console.log('Curriculum data fetched from database');
+  console.log('Finished fetching challenge data from the database');
 }
 
 fetchCurriculumFromDB();
-// after this, I can just adjust the curriculum array to something I want
 
 app.get('/curriculum', (req, res) => {
   console.log('Someone is trying to get the curriculum!');
-  res.json(curriculumArray);
+  res.json(curriculum);
+});
+
+app.get('/challenges', (req, res) => {
+  console.log('Someone is trying to get the challenges!');
+  res.json(challengesArray);
 });
 
 app.get('/superblock-map', async (req, res) => {
