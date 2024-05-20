@@ -950,10 +950,6 @@ importers:
         version: 4.10.0(webpack-bundle-analyzer@4.10.1)(webpack@5.90.3)
 
   curriculum:
-    dependencies:
-      marked:
-        specifier: 12.0.2
-        version: 12.0.2
     devDependencies:
       '@babel/core':
         specifier: 7.23.7
@@ -19528,12 +19524,6 @@ packages:
       markdown-it: 14.0.0
       markdownlint-micromark: 0.1.8
     dev: true
-
-  /marked@12.0.2:
-    resolution: {integrity: sha512-qXUm7e/YKFoqFPYPa3Ukg9xlI5cyAtGmyEIzMfW//m6kXwCy2Ps9DYf5ioijFKQ8qyuscrHoY04iJGctu2Kg0Q==}
-    engines: {node: '>= 18'}
-    hasBin: true
-    dev: false
 
   /matchmediaquery@0.3.1:
     resolution: {integrity: sha512-Hlk20WQHRIm9EE9luN1kjRjYXAQToHOIAHPJn9buxBwuhfTHoKUcX+lXBbxc85DVQfXYbEQ4HcwQdd128E3qHQ==}

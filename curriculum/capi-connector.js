@@ -1,5 +1,3 @@
-const { marked } = require('marked');
-
 async function fetchCapCurriculum() {
   try {
     const response = await fetch('http://localhost:3010/curriculum');
@@ -23,7 +21,7 @@ function getCapDescription(capCurriculum, englishPath) {
   const challenge = getChallengeFromPath(capCurriculum, englishPath);
 
   return challenge?.description
-    ? `<section id="description">${marked(challenge.description)}</section>`
+    ? `<section id="description">${challenge.description}</section>`
     : '';
 }
 
@@ -31,7 +29,7 @@ function getCapInstructions(capCurriculum, englishPath) {
   const challenge = getChallengeFromPath(capCurriculum, englishPath);
 
   return challenge?.instructions
-    ? `<section id="instruction">${marked(challenge.instructions)}</section>`
+    ? `<section id="instruction">${challenge.instructions}</section>`
     : '';
 }
 
