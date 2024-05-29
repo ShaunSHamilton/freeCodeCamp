@@ -25,6 +25,31 @@ export function snakerize(str) {
   });
 }
 
+export function removeNulls(obj) {
+  if (obj === null) {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    for (let i = obj.length - 1; i >= 0; i--) {
+      if (obj[i] === null) {
+        obj.splice(i, 1);
+      } else if (typeof obj[i] === 'object') {
+        removeNulls(obj[i]);
+      }
+    }
+  } else if (typeof obj === 'object') {
+    for (const key in obj) {
+      if (obj[key] === null) {
+        delete obj[key];
+      } else if (typeof obj[key] === 'object') {
+        removeNulls(obj[key]);
+      }
+    }
+  }
+  return obj;
+}
+
 export async function runSQL(connection, sql) {
   return new Promise((resolve, _reject) => {
     connection.query(sql, (err, _result) => {

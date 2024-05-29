@@ -4,7 +4,8 @@ import {
   getTableName,
   getColumnType,
   runCreateTable,
-  insert
+  insert,
+  removeNulls
 } from './utils.js';
 import { challengeTypeToTablesMap } from './challenge-type-to-tables-map.js';
 import { getSuperblockTitle, getBlockTitle } from './intro-dot-json-info.js';
@@ -260,7 +261,9 @@ export async function addChallenges(connection, data) {
           continue;
         }
       } else if (columnType === 'JSON') {
-        values.push(JSON.stringify(value));
+        // to clone the object so we can delete the null values
+        const newValue = JSON.parse(JSON.stringify(value));
+        values.push(JSON.stringify(removeNulls(newValue)));
         await insert(
           connection,
           tableName,
