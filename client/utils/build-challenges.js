@@ -1,6 +1,5 @@
 const path = require('path');
-// uncomment if you want to write the learn-curriculum.json file below
-// const { writeFileSync } = require('fs');
+const { writeFileSync } = require('fs');
 const _ = require('lodash');
 
 const envData = require('../config/env.json');
@@ -39,8 +38,10 @@ exports.replaceChallengeNode = () => {
 
 exports.buildChallenges = async function buildChallenges() {
   const curriculum = await getChallengesForLang(curriculumLocale);
-  // uncomment to write the learn-curriculum.json file in dolt/api
-  // writeFileSync(`../dolt/api/learn-curriculum.json`, JSON.stringify(curriculum, null, 2));
+  writeFileSync(
+    `../dolt/api/learn-curriculum.json`,
+    JSON.stringify(curriculum, null, 2)
+  );
   const superBlocks = Object.keys(curriculum);
   const blocks = superBlocks
     .map(superBlock => curriculum[superBlock].blocks)

@@ -124,5 +124,39 @@ export const columnsToGraphqlName = {
   fill_in_the_blank: 'fillInTheBlank',
   prerequisites: 'prerequisites',
   required_resources: 'required',
-  question: 'question'
+  question: 'question',
+  course_url: 'url'
+};
+
+// Get the name of the cert key for the curriculum.certifications object from the cert dashed name
+export const certDashedNameToKey = {
+  'a2-english-for-developers': 'a2-english-for-developers-certification',
+  'back-end-development-and-apis':
+    'back-end-development-and-apis-certification',
+  'college-algebra-with-python': 'college-algebra-with-python-certification',
+  'data-analysis-with-python': 'data-analysis-with-python-certification',
+  'data-visualization': 'data-visualization-certification',
+  'example-certification': 'example-certification',
+  'foundational-c-sharp-with-microsoft':
+    'foundational-c-sharp-with-microsoft-certification',
+  'front-end-development-libraries':
+    'front-end-development-libraries-certification',
+  'information-security': 'information-security-certification',
+  'javascript-algorithms-and-data-structures':
+    'javascript-algorithms-and-data-structures-certification',
+  'javascript-algorithms-and-data-structures-v8':
+    'javascript-algorithms-and-data-structures-v8',
+  'legacy-back-end': 'legacy-back-end-certification',
+  'legacy-data-visualization': 'legacy-data-visualization-certification',
+  'legacy-front-end': 'legacy-front-end-certification',
+  'legacy-full-stack': 'legacy-full-stack-certification',
+  'legacy-information-security-and-quality-assurance':
+    'legacy-information-security-and-quality-assurance-certification',
+  'machine-learning-with-python': 'machine-learning-with-python-certification',
+  'quality-assurance': 'quality-assurance-certification',
+  'relational-database': 'relational-database-certification',
+  'responsive-web-design': 'responsive-web-design-certification',
+  'scientific-computing-with-python':
+    'scientific-computing-with-python-certification',
+  'upcoming-python-certification': 'upcoming-python-certification'
 };

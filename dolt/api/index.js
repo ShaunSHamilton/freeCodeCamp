@@ -1,12 +1,25 @@
-import express from 'express';
 // uncomment if you want to write the curriculum.json file below
-// import { writeFileSync } from 'fs';
+import { writeFileSync } from 'fs';
+import express from 'express';
 import { createConnection } from 'mysql';
+import {
+  maybeJson,
+  fixSolutions,
+  fixChallengeFiles,
+  fixRequired,
+  fixTests,
+  fixNotes,
+  fixDescription,
+  fixInstructions,
+  fixAssignments,
+  fixFillInTheBlank,
+  fixQuestion
+} from './helpers';
 import {
   booleanFeatureTables,
   columnsToGraphqlName,
   featureTablesWithColumns,
-  tablesToJson
+  certDashedNameToKey
 } from './variables.js';
 
 const app = express();
@@ -17,10 +30,6 @@ db.connect(err => {
   if (err) throw err;
   console.log('MySQL database connected');
 });
-
-function maybeJson(table, value) {
-  return tablesToJson.includes(table) ? JSON.parse(value) : value;
-}
 
 async function runSQL(sql, values = []) {
   return new Promise((resolve, _reject) => {
@@ -36,7 +45,11 @@ async function runSQL(sql, values = []) {
 
 let challengesData = {};
 let challengesArray = [];
-let curriculum = {};
+let curriculum = {
+  certifications: {
+    blocks: {}
+  }
+};
 
 async function fetchCurriculumFromDB() {
   console.log('Fetching challenge data from database...');
@@ -101,9 +114,52 @@ async function fetchCurriculumFromDB() {
 
     challengesArray = Object.values(challengesData);
 
-    // Below this, we take the challengesArray and create the curriculum object in the
-    // way the two clients need. It creates the return of getChallengesForLang('english')
-    // Still need to add "certifications" to the curriculum object
+    // Below this, we take the challengesArray and make other queries to create the
+    // curriculum object in the way the two clients need. It creates the return of
+    // getChallengesForLang('english').
+    // TODO: allow for upcomingChanges in endpoint - delete/don't add those if true
+
+    // add certifications key to curriculumData
+    const certificationsQuery = 'SELECT * FROM certifications;';
+    const certificationsWithTestsQuery = `SELECT * FROM certifications
+      FULL JOIN certifications_prerequisites
+      ON certifications.id = certifications_prerequisites.certification_id;`;
+
+    const certifications = await runSQL(certificationsQuery);
+    const certificationWithTests = await runSQL(certificationsWithTestsQuery);
+
+    certifications.forEach(certification => {
+      const { object_id, title, dashed_name } = certification;
+
+      const certKey = certDashedNameToKey[dashed_name];
+      if (!certKey) {
+        throw new Error(`'certKey' not found for ${dashed_name}`);
+      }
+
+      const certTests = certificationWithTests
+        .filter(cert => cert.dashed_name === dashed_name)
+        .map(({ title = 'placeholder title', prerequisite_object_id }) => {
+          return {
+            id: prerequisite_object_id,
+            title
+          };
+        });
+
+      curriculum.certifications.blocks[certKey] = {
+        challenges: [
+          {
+            id: object_id,
+            title: title,
+            certification: dashed_name,
+            challengeType: 7,
+            isPrivate: true,
+            tests: certTests
+          }
+        ]
+      };
+    });
+
+    // add superblocks, meta, and challenges keys to curriculumData object
     const upcomingBlockIdsQuery = await runSQL(
       'SELECT block_id FROM block_is_upcoming'
     );
@@ -115,17 +171,22 @@ async function fetchCurriculumFromDB() {
       const {
         objectId,
         title,
-        challengeFiles = [],
+        dashedName,
+        challengeFiles,
         challengeOrder,
+        challengeType,
         blockId,
         blockTitle,
         blockDashedName,
         blockOrder,
         superblockDashedName,
-        blockTimeToComplete = '',
-        required = [],
-        template = '',
-        helpCategory = ''
+        superblockOrder,
+        blockTimeToComplete,
+        helpCategory,
+        // default these to false cause all challenges have them on client
+        usesMultifileEditor = false,
+        disableLoopProtectTests = false,
+        disableLoopProtectPreview = false
       } = challenge;
 
       // create superblock if it doesn't exist
@@ -145,10 +206,16 @@ async function fetchCurriculumFromDB() {
             helpCategory: helpCategory,
             order: blockOrder,
             time: blockTimeToComplete,
-            template,
-            required,
             superBlock: superblockDashedName,
             challengeOrder: [],
+
+            // These only get added to meta if they exist
+            ...(challenge.template && {
+              template: challenge.template
+            }),
+            ...(challenge.required && {
+              required: fixRequired(challenge.required)
+            }),
             ...(challenge.disableLoopProtectTests && {
               disableLoopProtectTests: true
             }),
@@ -161,8 +228,18 @@ async function fetchCurriculumFromDB() {
         };
       }
 
+      // I think these properties are added to the meta and each challenge:
+      // we'll find out when we test it
+      /*
+            "usesMultifileEditor"
+            "disableLoopProtectTests"
+            "disableLoopProtectPreview"
+            "hasEditableBoundaries"
+            "translationPending" ?
+      */
+
       // if any challenge hasEditableBoundaries, add hasEditableBoundaries: true to its block meta
-      const hasEditableBoundaries = challengeFiles.some(
+      const hasEditableBoundaries = challengeFiles?.some(
         cf => cf.editableRegionBoundaries?.length > 0
       );
 
@@ -173,11 +250,89 @@ async function fetchCurriculumFromDB() {
       }
 
       // for each challenge, push to their block.challenges
-      // TODO: markdownize values that need it
-      // TODO: adjust key names, e.g. blockDashedName -> block
-      curriculum[superblockDashedName].blocks[blockDashedName].challenges.push(
-        challenge
-      );
+      curriculum[superblockDashedName].blocks[blockDashedName].challenges.push({
+        // All challenges should have these
+        id: objectId,
+        title,
+        challengeType,
+        dashedName,
+        block: blockDashedName,
+        order: blockOrder,
+        superBlock: superblockDashedName,
+        superOrder: superblockOrder,
+        // The clients just use superblock dashed name for certification. Except for 2022/rwd
+        certification: superblockDashedName.includes('responsive-web-design')
+          ? 'responsive-web-design'
+          : superblockDashedName,
+        challengeOrder,
+        helpCategory,
+        time: blockTimeToComplete,
+        usesMultifileEditor,
+        hasEditableBoundaries: hasEditableBoundaries ? true : false,
+        disableLoopProtectTests,
+        disableLoopProtectPreview,
+
+        // see if we need to default these or not
+        solutions: challenge.solutions ? fixSolutions(challenge.solutions) : [],
+        assignments: challenge.assignments
+          ? fixAssignments(challenge.assignments)
+          : [],
+        tests: challenge.tests ? fixTests(challenge.tests) : [],
+        // come back to required and template after https://github.com/freeCodeCamp/freeCodeCamp/pull/55002
+        // and required after https://www.dolthub.com/repositories/sky020/curriculum/pulls/10
+        required: challenge.required ? fixRequired(challenge.required) : [],
+        template: challenge.template || '',
+
+        // false for all English, come back to this for i18n
+        translationPending: false,
+
+        // Not all challenges have these, only add if they exist
+        ...(challenge.description && {
+          description: fixDescription(challenge.description)
+        }),
+        ...(challenge.instructions && {
+          instructions: fixInstructions(challenge.instructions)
+        }),
+        ...(challenge.notes && {
+          notes: fixNotes(challenge.notes)
+        }),
+        ...(challenge.challengeFiles && {
+          challengeFiles: fixChallengeFiles(challenge.challengeFiles)
+        }),
+        ...(challenge.scene && {
+          scene: challenge.scene
+        }),
+        ...(challenge.fillInTheBlank && {
+          fillInTheBlank: fixFillInTheBlank(challenge.fillInTheBlank)
+        }),
+        ...(challenge.bilibiliIds && {
+          bilibiliIds: challenge.bilibiliIds
+        }),
+        ...(challenge.forumTopicId && {
+          forumTopicId: challenge.forumTopicId
+        }),
+        ...(challenge.msTrophyId && {
+          msTrophyId: challenge.msTrophyId
+        }),
+        ...(challenge.prerequisites && {
+          prerequisites: challenge.prerequisites
+        }),
+        ...(challenge.question && {
+          question: fixQuestion(challenge.question)
+        }),
+        ...(challenge.videoId && {
+          videoId: challenge.videoId
+        }),
+        ...(challenge.videoLocaleIds && {
+          videoLocaleIds: challenge.videoLocaleIds
+        }),
+        ...(challenge.videoUrl && {
+          videoUrl: challenge.videoUrl
+        }),
+        ...(challenge.url && {
+          url: challenge.url
+        })
+      });
 
       // for each challenge, push to meta.challengeOrder
       curriculum[superblockDashedName].blocks[
@@ -188,24 +343,11 @@ async function fetchCurriculumFromDB() {
       };
     }
 
-    // remove nulls from challengeOrder - this is just for the curriculum.test.js
-    // can remove once https://github.com/freeCodeCamp/freeCodeCamp/pull/54802 is in and on this branch
-    const superblockKeys = Object.keys(curriculum);
-    superblockKeys.forEach(superblockKey => {
-      const blockKeys = Object.keys(curriculum[superblockKey].blocks);
-      blockKeys.forEach(blockKey => {
-        curriculum[superblockKey].blocks[blockKey].meta.challengeOrder =
-          curriculum[superblockKey].blocks[blockKey].meta.challengeOrder.filter(
-            Boolean
-          );
-      });
-    });
-
-    // uncomment to write curriculum.json file
-    // writeFileSync(`./curriculum.json`, JSON.stringify(curriculum, null, 2));
-    // console.log('Curriculum written to file');
+    writeFileSync(`./curriculum.json`, JSON.stringify(curriculum, null, 2));
+    console.log('Curriculum written to file');
   } catch (err) {
     console.error(err);
+    process.exit(1);
   }
 
   console.log('Finished fetching challenge data from the database');

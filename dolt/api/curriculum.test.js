@@ -5,46 +5,384 @@ const oldCurriculumFile = readFileSync('./learn-curriculum.json', 'utf8');
 const newCurriculum = JSON.parse(newCurriculumFile);
 const oldCurriculum = JSON.parse(oldCurriculumFile);
 
+const newCertifications = newCurriculum.certifications;
+const oldCertifications = oldCurriculum.certifications;
+delete newCurriculum.certifications;
+delete oldCurriculum.certifications;
 const superblocks = Object.keys(newCurriculum);
 
-function lowerCaseChallengeOrder(challengeOrder) {
-  return challengeOrder.map(({ id, title }) => {
-    return { id, title: title.toLowerCase() };
-  });
-}
+// add test for "Should have all the same keys"
+const testCertifications = true;
+const testMeta = true;
+const testChallenges = true;
 
 describe('curriculum', () => {
-  superblocks.forEach(superblock => {
-    const blocks = Object.keys(newCurriculum[superblock].blocks);
+  it('should have all the same keys', () => {
+    expect(Object.keys(newCurriculum)).toEqual(Object.keys(oldCurriculum));
+  });
 
-    blocks.forEach(block => {
-      // meta stuff
-      const newBlockMeta = newCurriculum[superblock].blocks[block].meta;
-      const oldBlockMeta = oldCurriculum[superblock].blocks[block].meta;
-
-      // just ignoring the name field for now. Uncomment to see ones that don't match
-      newBlockMeta.name = '';
-      oldBlockMeta.name = '';
-
-      // making the titles in challengeOrder lowercase for now. Uncomment to see more fails
-      newBlockMeta.challengeOrder = lowerCaseChallengeOrder(
-        newBlockMeta.challengeOrder
-      );
-      oldBlockMeta.challengeOrder = lowerCaseChallengeOrder(
-        oldBlockMeta.challengeOrder
-      );
-
-      it(`${superblock} : ${block} should have the same meta`, () => {
-        expect(newBlockMeta).toEqual(oldBlockMeta);
-      });
-
-      // challenges stuff
-      // const newBlockChallenges = newCurriculum[superblock].blocks[block].challenges;
-      // const oldBlockChallenges = oldCurriculum[superblock].blocks[block].challenges;
-
-      // it(`${superblock} : ${block} should have the same challenges`, () => {
-      //   expect(newBlockChallenges).toEqual(oldBlockChallenges);
+  if (testCertifications) {
+    describe('certifications', () => {
+      // uncomment this to see all the differences
+      // it('should have the same certifications', () => {
+      //   expect(newCertifications).toEqual(oldCertifications);
       // });
+
+      describe('blocks', () => {
+        const newBlocks = Object.keys(newCertifications.blocks);
+        const oldBlocks = Object.keys(oldCertifications.blocks);
+
+        it('should have the same keys', () => {
+          expect(newBlocks).toEqual(oldBlocks);
+        });
+
+        newBlocks.forEach(certKey => {
+          describe(certKey, () => {
+            const newChallenges = newCertifications.blocks[certKey].challenges;
+            const oldChallenges = oldCertifications.blocks[certKey].challenges;
+
+            it(`should have a challenges array with a singe item`, () => {
+              expect(newChallenges).toHaveLength(1);
+
+              expect(oldChallenges).toHaveLength(1);
+            });
+
+            describe('challenges', () => {
+              const newChallenge = newChallenges[0];
+              const oldChallenge = oldChallenges[0];
+
+              it(`should have the same properties and values`, () => {
+                expect(newChallenge.id).toEqual(oldChallenge.id);
+
+                expect(newChallenge.title).toEqual(oldChallenge.title);
+
+                expect(newChallenge.certification).toEqual(
+                  oldChallenge.certification
+                );
+
+                expect(newChallenge.challengeType).toEqual(
+                  oldChallenge.challengeType
+                );
+
+                expect(newChallenge.isPrivate).toEqual(oldChallenge.isPrivate);
+
+                // should have a 'tests' array with the same length
+                expect(newChallenge.tests.length).toEqual(
+                  oldChallenge.tests.length
+                );
+
+                // should have a 'tests' array with the same id's, in any order
+                // order shouldn't matter?
+                const newTestIds = newChallenge.tests
+                  .map(test => test.id)
+                  .sort();
+                const oldTestIds = oldChallenge.tests
+                  .map(test => test.id)
+                  .sort();
+                expect(newTestIds).toEqual(oldTestIds);
+              });
+
+              // I don't think the title matters, pretty sure it's not used.
+              // The title's in the database don't always match the title used in this file.
+              // also, some title's aren't challenges. E.g. the tests for the full stack cert
+              // are other certifications. So they aren't in the database as challenges or anything.
+            });
+          });
+        });
+      });
+    });
+  }
+
+  describe('superblocks', () => {
+    superblocks.forEach(superblock => {
+      describe(superblock, () => {
+        const newBlocks = Object.keys(newCurriculum[superblock].blocks);
+        const oldBlocks = Object.keys(oldCurriculum[superblock].blocks);
+
+        it('should have all the same keys', () => {
+          expect(Object.keys(newBlocks)).toEqual(Object.keys(oldBlocks));
+        });
+
+        newBlocks.forEach(block => {
+          describe(block, () => {
+            if (testMeta) {
+              describe('meta', () => {
+                const newBlockMeta =
+                  newCurriculum[superblock].blocks[block].meta;
+                const oldBlockMeta =
+                  oldCurriculum[superblock].blocks[block].meta;
+
+                // uncomment this to see all the differences
+                // it(`${superblock} : ${block} should have the same meta`, () => {
+                //   expect(newBlockMeta).toEqual(oldBlockMeta);
+                // });
+
+                it(`should have the same properties and values`, () => {
+                  // 192 failing - uncomment after https://github.com/freeCodeCamp/freeCodeCamp/pull/54823
+                  // should have all the same keys
+                  // expect(Object.keys(newBlockMeta).sort()).toEqual(
+                  //   Object.keys(oldBlockMeta).sort()
+                  // );
+
+                  expect(newBlockMeta.isUpcomingChange).toEqual(
+                    oldBlockMeta.isUpcomingChange
+                  );
+
+                  expect(newBlockMeta.dashedName).toEqual(
+                    oldBlockMeta.dashedName
+                  );
+
+                  expect(newBlockMeta.helpCategory).toEqual(
+                    oldBlockMeta.helpCategory
+                  );
+
+                  expect(newBlockMeta.usesMultifileEditor).toEqual(
+                    oldBlockMeta.usesMultifileEditor
+                  );
+
+                  // 2 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54955
+                  // expect(newBlockMeta.hasEditableBoundaries).toEqual(
+                  //   oldBlockMeta.hasEditableBoundaries
+                  // );
+
+                  expect(newBlockMeta.disableLoopProtectTests).toEqual(
+                    oldBlockMeta.disableLoopProtectTests
+                  );
+
+                  expect(newBlockMeta.disableLoopProtectPreview).toEqual(
+                    oldBlockMeta.disableLoopProtectPreview
+                  );
+
+                  expect(newBlockMeta.translationPending).toEqual(
+                    oldBlockMeta.translationPending
+                  );
+
+                  expect(newBlockMeta.order).toEqual(oldBlockMeta.order);
+
+                  expect(newBlockMeta.time).toEqual(oldBlockMeta.time);
+
+                  expect(newBlockMeta.superBlock).toEqual(
+                    oldBlockMeta.superBlock
+                  );
+
+                  // Many, but not all, of the meta.json files have an empty string as the template
+                  // So we default both of them to an empty string if it doesn't exist.
+                  // Revisit after
+                  expect(newBlockMeta.template || '').toEqual(
+                    oldBlockMeta.template || ''
+                  );
+
+                  // Many, but not all, of the meta.json files have an empty array as required
+                  // So we default both of them to an empty array if it doesn't exist.
+                  expect(newBlockMeta.required || []).toEqual(
+                    oldBlockMeta.required || []
+                  );
+
+                  // challengeOrder, the titles aren't used in the clients
+                  const newOrder = newBlockMeta.challengeOrder.map(({ id }) => {
+                    return { id };
+                  });
+                  const oldOrder = oldBlockMeta.challengeOrder.map(({ id }) => {
+                    return { id };
+                  });
+                  // 1 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54928
+                  expect(newOrder).toEqual(oldOrder);
+                });
+              });
+            }
+
+            if (testChallenges) {
+              describe('challenges', () => {
+                const newBlockChallenges =
+                  newCurriculum[superblock].blocks[block].challenges;
+                const oldBlockChallenges =
+                  oldCurriculum[superblock].blocks[block].challenges;
+
+                // uncomment this to see all the differences
+                // it(`${superblock} : ${block} should have the same challenges`, () => {
+                //   expect(newBlockChallenges).toEqual(oldBlockChallenges);
+                // });
+
+                newBlockChallenges.forEach(newChallenge => {
+                  describe(newChallenge.dashedName, () => {
+                    const oldChallenge = oldBlockChallenges.find(
+                      oldChallenge => oldChallenge.id === newChallenge.id
+                    );
+
+                    if (!oldChallenge) {
+                      console.error(
+                        `Could not find old challenge with id ${newChallenge.id}`
+                      );
+                      process.exit(1);
+                    }
+
+                    it('should have the same properties and values', () => {
+                      // should have all the same keys
+                      // remove the template filter once https://github.com/freeCodeCamp/freeCodeCamp/pull/54823 is in
+                      // remove the audioPath filter after next update
+                      // remove videoUrl filter once https://github.com/freeCodeCamp/freeCodeCamp/pull/54976 is in
+                      expect(
+                        Object.keys(newChallenge)
+                          .filter(
+                            k =>
+                              k !== 'template' &&
+                              k !== 'audioPath' &&
+                              k !== 'videoUrl'
+                          )
+                          .sort()
+                      ).toEqual(
+                        Object.keys(oldChallenge)
+                          .filter(
+                            k =>
+                              k !== 'template' &&
+                              k !== 'audioPath' &&
+                              k !== 'videoUrl'
+                          )
+                          .sort()
+                      );
+
+                      expect(newChallenge.id).toEqual(oldChallenge.id);
+
+                      expect(newChallenge.title).toEqual(oldChallenge.title);
+
+                      expect(newChallenge.challengeType).toEqual(
+                        oldChallenge.challengeType
+                      );
+
+                      expect(newChallenge.dashedName).toEqual(
+                        oldChallenge.dashedName
+                      );
+
+                      expect(newChallenge.block).toEqual(oldChallenge.block);
+
+                      expect(newChallenge.order).toEqual(oldChallenge.order);
+
+                      expect(newChallenge.superBlock).toEqual(
+                        oldChallenge.superBlock
+                      );
+
+                      expect(newChallenge.superOrder).toEqual(
+                        oldChallenge.superOrder
+                      );
+
+                      expect(newChallenge.certification).toEqual(
+                        oldChallenge.certification
+                      );
+
+                      expect(newChallenge.challengeOrder).toEqual(
+                        oldChallenge.challengeOrder
+                      );
+
+                      expect(newChallenge.helpCategory).toEqual(
+                        oldChallenge.helpCategory
+                      );
+
+                      expect(newChallenge.time).toEqual(oldChallenge.time);
+
+                      expect(newChallenge.usesMultifileEditor).toEqual(
+                        oldChallenge.usesMultifileEditor
+                      );
+
+                      // 147 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54955
+                      // expect(newChallenge.hasEditableBoundaries).toEqual(
+                      //   oldChallenge.hasEditableBoundaries
+                      // );
+
+                      expect(newChallenge.disableLoopProtectTests).toEqual(
+                        oldChallenge.disableLoopProtectTests
+                      );
+
+                      expect(newChallenge.disableLoopProtectPreview).toEqual(
+                        oldChallenge.disableLoopProtectPreview
+                      );
+
+                      expect(newChallenge.solutions).toEqual(
+                        oldChallenge.solutions
+                      );
+
+                      expect(newChallenge.required).toEqual(
+                        oldChallenge.required
+                      );
+
+                      // 137 failing - should fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54823
+                      // expect(newChallenge.template).toEqual(oldChallenge.template);
+
+                      expect(newChallenge.assignments).toEqual(
+                        oldChallenge.assignments
+                      );
+                      expect(newChallenge.tests).toEqual(oldChallenge.tests);
+
+                      expect(newChallenge.translationPending).toEqual(
+                        oldChallenge.translationPending
+                      );
+
+                      // 2 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/55002
+                      // expect(newChallenge.description).toEqual(
+                      //   oldChallenge.description
+                      // );
+
+                      // 1 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/55002
+                      // expect(newChallenge.instructions).toEqual(
+                      //   oldChallenge.instructions
+                      // );
+
+                      expect(newChallenge.notes).toEqual(oldChallenge.notes);
+
+                      expect(newChallenge.challengeFiles).toEqual(
+                        oldChallenge.challengeFiles
+                      );
+
+                      // 3 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/55014
+                      // expect(newChallenge.fillInTheBlank).toEqual(
+                      //   oldChallenge.fillInTheBlank
+                      // );
+
+                      expect(newChallenge.bilibiliIds).toEqual(
+                        oldChallenge.bilibiliIds
+                      );
+
+                      // 1056 failing - should be fixed with https://www.dolthub.com/repositories/sky020/curriculum/pulls/10
+                      // expect(newChallenge.scene).toEqual(oldChallenge.scene);
+
+                      expect(newChallenge.forumTopicId).toEqual(
+                        oldChallenge.forumTopicId
+                      );
+
+                      expect(newChallenge.msTrophyId).toEqual(
+                        oldChallenge.msTrophyId
+                      );
+
+                      expect(newChallenge.prerequisites).toEqual(
+                        oldChallenge.prerequisites
+                      );
+
+                      // 1 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/55013
+                      // expect(newChallenge.question).toEqual(
+                      //   oldChallenge.question
+                      // );
+
+                      expect(newChallenge.videoId).toEqual(
+                        oldChallenge.videoId
+                      );
+
+                      expect(newChallenge.videoLocaleIds).toEqual(
+                        oldChallenge.videoLocaleIds
+                      );
+
+                      // 3 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54976
+                      // expect(newChallenge.videoUrl).toEqual(
+                      //   oldChallenge.videoUrl
+                      // );
+
+                      expect(newChallenge.url).toEqual(oldChallenge.url);
+                    });
+                  });
+                });
+              });
+            }
+          });
+        });
+      });
     });
   });
 });
