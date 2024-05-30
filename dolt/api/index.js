@@ -14,7 +14,7 @@ import {
   fixAssignments,
   fixFillInTheBlank,
   fixQuestion
-} from './helpers';
+} from './helpers.js';
 import {
   booleanFeatureTables,
   columnsToGraphqlName,
