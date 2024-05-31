@@ -2,7 +2,6 @@
 const tables = {
   app_url: 'app_url',
   assignments: 'assignments',
-  audio_path: 'audio_path',
   bilibili_ids: 'bilibili_ids',
   block_time_to_complete: 'block_time_to_complete',
   blocks_challenges: 'blocks_challenges',
@@ -47,7 +46,6 @@ const tables = {
 // column name in that table on the right
 export const featureTablesWithColumns = {
   [tables.assignments]: 'assignments',
-  [tables.audio_path]: 'audioPath',
   [tables.bilibili_ids]: 'bilibiliIds',
   // [tables.block_time_to_complete]: [],
   // [tables.blocks_challenges]: [],

@@ -140,10 +140,9 @@ describe('curriculum', () => {
                     oldBlockMeta.usesMultifileEditor
                   );
 
-                  // 2 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54955
-                  // expect(newBlockMeta.hasEditableBoundaries).toEqual(
-                  //   oldBlockMeta.hasEditableBoundaries
-                  // );
+                  expect(newBlockMeta.hasEditableBoundaries).toEqual(
+                    oldBlockMeta.hasEditableBoundaries
+                  );
 
                   expect(newBlockMeta.disableLoopProtectTests).toEqual(
                     oldBlockMeta.disableLoopProtectTests
@@ -185,7 +184,6 @@ describe('curriculum', () => {
                   const oldOrder = oldBlockMeta.challengeOrder.map(({ id }) => {
                     return { id };
                   });
-                  // 1 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54928
                   expect(newOrder).toEqual(oldOrder);
                 });
               });
@@ -219,25 +217,13 @@ describe('curriculum', () => {
                     it('should have the same properties and values', () => {
                       // should have all the same keys
                       // remove the template filter once https://github.com/freeCodeCamp/freeCodeCamp/pull/54823 is in
-                      // remove the audioPath filter after next update
-                      // remove videoUrl filter once https://github.com/freeCodeCamp/freeCodeCamp/pull/54976 is in
                       expect(
                         Object.keys(newChallenge)
-                          .filter(
-                            k =>
-                              k !== 'template' &&
-                              k !== 'audioPath' &&
-                              k !== 'videoUrl'
-                          )
+                          .filter(k => k !== 'template')
                           .sort()
                       ).toEqual(
                         Object.keys(oldChallenge)
-                          .filter(
-                            k =>
-                              k !== 'template' &&
-                              k !== 'audioPath' &&
-                              k !== 'videoUrl'
-                          )
+                          .filter(k => k !== 'template')
                           .sort()
                       );
 
@@ -283,10 +269,9 @@ describe('curriculum', () => {
                         oldChallenge.usesMultifileEditor
                       );
 
-                      // 147 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54955
-                      // expect(newChallenge.hasEditableBoundaries).toEqual(
-                      //   oldChallenge.hasEditableBoundaries
-                      // );
+                      expect(newChallenge.hasEditableBoundaries).toEqual(
+                        oldChallenge.hasEditableBoundaries
+                      );
 
                       expect(newChallenge.disableLoopProtectTests).toEqual(
                         oldChallenge.disableLoopProtectTests
@@ -316,15 +301,13 @@ describe('curriculum', () => {
                         oldChallenge.translationPending
                       );
 
-                      // 2 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/55002
-                      // expect(newChallenge.description).toEqual(
-                      //   oldChallenge.description
-                      // );
+                      expect(newChallenge.description).toEqual(
+                        oldChallenge.description
+                      );
 
-                      // 1 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/55002
-                      // expect(newChallenge.instructions).toEqual(
-                      //   oldChallenge.instructions
-                      // );
+                      expect(newChallenge.instructions).toEqual(
+                        oldChallenge.instructions
+                      );
 
                       expect(newChallenge.notes).toEqual(oldChallenge.notes);
 
@@ -341,8 +324,7 @@ describe('curriculum', () => {
                         oldChallenge.bilibiliIds
                       );
 
-                      // 1056 failing - should be fixed with https://www.dolthub.com/repositories/sky020/curriculum/pulls/10
-                      // expect(newChallenge.scene).toEqual(oldChallenge.scene);
+                      expect(newChallenge.scene).toEqual(oldChallenge.scene);
 
                       expect(newChallenge.forumTopicId).toEqual(
                         oldChallenge.forumTopicId
@@ -369,10 +351,9 @@ describe('curriculum', () => {
                         oldChallenge.videoLocaleIds
                       );
 
-                      // 3 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54976
-                      // expect(newChallenge.videoUrl).toEqual(
-                      //   oldChallenge.videoUrl
-                      // );
+                      expect(newChallenge.videoUrl).toEqual(
+                        oldChallenge.videoUrl
+                      );
 
                       expect(newChallenge.url).toEqual(oldChallenge.url);
                     });
