@@ -331,15 +331,6 @@ CREATE TABLE IF NOT EXISTS fill_in_the_blank (
 );
 
 
-CREATE TABLE IF NOT EXISTS audio_path (
-  id INT NOT NULL AUTO_INCREMENT,
-  challenge_id INT NOT NULL,
-  audioPath TEXT,
-  PRIMARY KEY (id),
-  FOREIGN KEY (challenge_id) REFERENCES challenges(id)
-);
-
-
 CREATE TABLE IF NOT EXISTS video_locale_ids (
   id INT NOT NULL AUTO_INCREMENT,
   challenge_id INT NOT NULL,
