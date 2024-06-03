@@ -135,6 +135,7 @@ export async function addChallenges(connection, data) {
   const feature_table_ids = {};
   let block_id = 1;
   let superblock_id = 1;
+  let block_time_to_complete_id = 1;
   let block_is_upcoming_id = 1;
   let uses_multifile_editor_id = 1;
   let c = 1;
@@ -195,7 +196,7 @@ export async function addChallenges(connection, data) {
           connection,
           'block_time_to_complete',
           ['id', 'block_id', 'time_to_complete'],
-          [block_id, block_id, time]
+          [block_time_to_complete_id++, block_id, time]
         );
       }
 
