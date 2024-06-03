@@ -11,7 +11,6 @@ delete newCurriculum.certifications;
 delete oldCurriculum.certifications;
 const superblocks = Object.keys(newCurriculum);
 
-// add test for "Should have all the same keys"
 const testCertifications = true;
 const testMeta = true;
 const testChallenges = true;
@@ -118,11 +117,9 @@ describe('curriculum', () => {
                 // });
 
                 it(`should have the same properties and values`, () => {
-                  // 192 failing - uncomment after https://github.com/freeCodeCamp/freeCodeCamp/pull/54823
-                  // should have all the same keys
-                  // expect(Object.keys(newBlockMeta).sort()).toEqual(
-                  //   Object.keys(oldBlockMeta).sort()
-                  // );
+                  expect(Object.keys(newBlockMeta).sort()).toEqual(
+                    Object.keys(oldBlockMeta).sort()
+                  );
 
                   expect(newBlockMeta.isUpcomingChange).toEqual(
                     oldBlockMeta.isUpcomingChange
@@ -164,18 +161,9 @@ describe('curriculum', () => {
                     oldBlockMeta.superBlock
                   );
 
-                  // Many, but not all, of the meta.json files have an empty string as the template
-                  // So we default both of them to an empty string if it doesn't exist.
-                  // Revisit after
-                  expect(newBlockMeta.template || '').toEqual(
-                    oldBlockMeta.template || ''
-                  );
+                  expect(newBlockMeta.template).toEqual(oldBlockMeta.template);
 
-                  // Many, but not all, of the meta.json files have an empty array as required
-                  // So we default both of them to an empty array if it doesn't exist.
-                  expect(newBlockMeta.required || []).toEqual(
-                    oldBlockMeta.required || []
-                  );
+                  expect(newBlockMeta.required).toEqual(oldBlockMeta.required);
 
                   // challengeOrder, the titles aren't used in the clients
                   const newOrder = newBlockMeta.challengeOrder.map(({ id }) => {
@@ -215,16 +203,8 @@ describe('curriculum', () => {
                     }
 
                     it('should have the same properties and values', () => {
-                      // should have all the same keys
-                      // remove the template filter once https://github.com/freeCodeCamp/freeCodeCamp/pull/54823 is in
-                      expect(
-                        Object.keys(newChallenge)
-                          .filter(k => k !== 'template')
-                          .sort()
-                      ).toEqual(
-                        Object.keys(oldChallenge)
-                          .filter(k => k !== 'template')
-                          .sort()
+                      expect(Object.keys(newChallenge).sort()).toEqual(
+                        Object.keys(oldChallenge).sort()
                       );
 
                       expect(newChallenge.id).toEqual(oldChallenge.id);
@@ -289,8 +269,9 @@ describe('curriculum', () => {
                         oldChallenge.required
                       );
 
-                      // 137 failing - should fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/54823
-                      // expect(newChallenge.template).toEqual(oldChallenge.template);
+                      expect(newChallenge.template).toEqual(
+                        oldChallenge.template
+                      );
 
                       expect(newChallenge.assignments).toEqual(
                         oldChallenge.assignments
@@ -316,9 +297,9 @@ describe('curriculum', () => {
                       );
 
                       // 3 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/55014
-                      // expect(newChallenge.fillInTheBlank).toEqual(
-                      //   oldChallenge.fillInTheBlank
-                      // );
+                      expect(newChallenge.fillInTheBlank).toEqual(
+                        oldChallenge.fillInTheBlank
+                      );
 
                       expect(newChallenge.bilibiliIds).toEqual(
                         oldChallenge.bilibiliIds
@@ -339,9 +320,9 @@ describe('curriculum', () => {
                       );
 
                       // 1 failing - should be fixed with https://github.com/freeCodeCamp/freeCodeCamp/pull/55013
-                      // expect(newChallenge.question).toEqual(
-                      //   oldChallenge.question
-                      // );
+                      expect(newChallenge.question).toEqual(
+                        oldChallenge.question
+                      );
 
                       expect(newChallenge.videoId).toEqual(
                         oldChallenge.videoId

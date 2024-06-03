@@ -6,7 +6,6 @@ import {
   maybeJson,
   fixSolutions,
   fixChallengeFiles,
-  fixRequired,
   fixTests,
   fixNotes,
   fixDescription,
@@ -181,7 +180,6 @@ async function fetchCurriculumFromDB() {
         blockOrder,
         superblockDashedName,
         superblockOrder,
-        blockTimeToComplete,
         helpCategory,
         // default these to false cause all challenges have them on client
         usesMultifileEditor = false,
@@ -205,7 +203,6 @@ async function fetchCurriculumFromDB() {
             dashedName: blockDashedName,
             helpCategory: helpCategory,
             order: blockOrder,
-            time: blockTimeToComplete,
             superBlock: superblockDashedName,
             challengeOrder: [],
 
@@ -214,7 +211,7 @@ async function fetchCurriculumFromDB() {
               template: challenge.template
             }),
             ...(challenge.required && {
-              required: fixRequired(challenge.required)
+              required: challenge.required
             }),
             ...(challenge.disableLoopProtectTests && {
               disableLoopProtectTests: true
@@ -222,7 +219,10 @@ async function fetchCurriculumFromDB() {
             ...(challenge.disableLoopProtectPreview && {
               disableLoopProtectPreview: true
             }),
-            ...(challenge.usesMultifileEditor && { usesMultifileEditor: true })
+            ...(challenge.usesMultifileEditor && { usesMultifileEditor: true }),
+            ...(challenge.blockTimeToComplete && {
+              time: challenge.blockTimeToComplete
+            })
           },
           challenges: []
         };
@@ -266,7 +266,6 @@ async function fetchCurriculumFromDB() {
           : superblockDashedName,
         challengeOrder,
         helpCategory,
-        time: blockTimeToComplete,
         usesMultifileEditor,
         hasEditableBoundaries: hasEditableBoundaries ? true : false,
         disableLoopProtectTests,
@@ -280,13 +279,15 @@ async function fetchCurriculumFromDB() {
         tests: challenge.tests ? fixTests(challenge.tests) : [],
         // come back to required and template after https://github.com/freeCodeCamp/freeCodeCamp/pull/55002
         // and required after https://www.dolthub.com/repositories/sky020/curriculum/pulls/10
-        required: challenge.required ? fixRequired(challenge.required) : [],
-        template: challenge.template || '',
+        required: challenge.required ? challenge.required : [],
 
         // false for all English, come back to this for i18n
         translationPending: false,
 
         // Not all challenges have these, only add if they exist
+        ...(challenge.blockTimeToComplete && {
+          time: challenge.blockTimeToComplete
+        }),
         ...(challenge.description && {
           description: fixDescription(challenge.description)
         }),
@@ -319,6 +320,9 @@ async function fetchCurriculumFromDB() {
         }),
         ...(challenge.question && {
           question: fixQuestion(challenge.question)
+        }),
+        ...(challenge.template && {
+          template: challenge.template
         }),
         ...(challenge.videoId && {
           videoId: challenge.videoId

@@ -23,21 +23,6 @@ ${html}
 </section>`;
 };
 
-export const fixRequired = required =>
-  required.map(r => {
-    return {
-      ...(r.link && {
-        link: r.link
-      }),
-      ...(r.raw && {
-        raw: r.raw
-      }),
-      ...(r.src && {
-        src: r.src
-      })
-    };
-  });
-
 export const fixTests = tests =>
   tests.map(test => {
     return {
