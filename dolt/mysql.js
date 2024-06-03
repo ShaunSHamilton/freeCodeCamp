@@ -190,12 +190,14 @@ export async function addChallenges(connection, data) {
       block_to_block_id_map.set(block, block_id);
 
       // Add `block_time_to_complete` and `block_is_upcoming` as special case, because it is per-block
-      await insert(
-        connection,
-        'block_time_to_complete',
-        ['id', 'block_id', 'time_to_complete'],
-        [block_id, block_id, time]
-      );
+      if (time) {
+        await insert(
+          connection,
+          'block_time_to_complete',
+          ['id', 'block_id', 'time_to_complete'],
+          [block_id, block_id, time]
+        );
+      }
 
       if (getBlockIsUpcoming(block)) {
         await insert(
