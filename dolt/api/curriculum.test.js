@@ -155,8 +155,6 @@ describe('curriculum', () => {
 
                   expect(newBlockMeta.order).toEqual(oldBlockMeta.order);
 
-                  expect(newBlockMeta.time).toEqual(oldBlockMeta.time);
-
                   expect(newBlockMeta.superBlock).toEqual(
                     oldBlockMeta.superBlock
                   );
@@ -242,8 +240,6 @@ describe('curriculum', () => {
                       expect(newChallenge.helpCategory).toEqual(
                         oldChallenge.helpCategory
                       );
-
-                      expect(newChallenge.time).toEqual(oldChallenge.time);
 
                       expect(newChallenge.usesMultifileEditor).toEqual(
                         oldChallenge.usesMultifileEditor

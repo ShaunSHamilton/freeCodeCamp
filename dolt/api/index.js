@@ -64,7 +64,6 @@ async function fetchCurriculumFromDB() {
     b.id AS blockId,
     b.title AS blockTitle,
     b.dashed_name AS blockDashedName,
-    bt.time_to_complete AS blockTimeToComplete,
     block_order AS blockOrder,
     s.title AS superblockTitle,
     s.dashed_name AS superblockDashedName,
@@ -72,7 +71,6 @@ async function fetchCurriculumFromDB() {
   FROM challenges AS c
   FULL JOIN blocks_challenges AS bc ON c.id = bc.challenge_id
   FULL JOIN blocks as b ON bc.block_id = b.id
-  FULL JOIN block_time_to_complete AS bt ON bt.block_id = b.id
   FULL JOIN superblocks_blocks as sb ON sb.block_id = b.id
   FULL JOIN superblocks AS s ON s.id = sb.superblock_id;`;
 
@@ -219,10 +217,7 @@ async function fetchCurriculumFromDB() {
             ...(challenge.disableLoopProtectPreview && {
               disableLoopProtectPreview: true
             }),
-            ...(challenge.usesMultifileEditor && { usesMultifileEditor: true }),
-            ...(challenge.blockTimeToComplete && {
-              time: challenge.blockTimeToComplete
-            })
+            ...(challenge.usesMultifileEditor && { usesMultifileEditor: true })
           },
           challenges: []
         };
@@ -283,9 +278,6 @@ async function fetchCurriculumFromDB() {
         translationPending: false,
 
         // Not all challenges have these, only add if they exist
-        ...(challenge.blockTimeToComplete && {
-          time: challenge.blockTimeToComplete
-        }),
         ...(challenge.description && {
           description: fixDescription(challenge.description)
         }),

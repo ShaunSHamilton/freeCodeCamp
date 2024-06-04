@@ -3,7 +3,6 @@ const tables = {
   app_url: 'app_url',
   assignments: 'assignments',
   bilibili_ids: 'bilibili_ids',
-  block_time_to_complete: 'block_time_to_complete',
   blocks_challenges: 'blocks_challenges',
   block_is_upcoming_change: 'block_is_upcoming_change',
   certifications_prerequisites: 'certifications_prerequisites',
@@ -47,7 +46,6 @@ const tables = {
 export const featureTablesWithColumns = {
   [tables.assignments]: 'assignments',
   [tables.bilibili_ids]: 'bilibiliIds',
-  // [tables.block_time_to_complete]: [],
   // [tables.blocks_challenges]: [],
   // [tables.certifications_prerequisites]: [],
   [tables.challenge_files]: 'challengeFiles',
