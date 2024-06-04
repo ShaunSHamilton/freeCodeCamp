@@ -20,4 +20,3 @@ shared/utils/is-audited.js
 shared/utils/validate.js
 shared/utils/validate.test.js
 web/.next
-tools/challenge-parser/parser/super-challenge.md
