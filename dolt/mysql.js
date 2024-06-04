@@ -46,7 +46,6 @@ export async function createTables(connection, data) {
       superOrder,
 
       description,
-      time,
       url,
       required,
       ...challenge
@@ -56,7 +55,6 @@ export async function createTables(connection, data) {
     // SPECIAL CASES
     // Usually, because of reserved words in mysql
     challenge.descriptions = description;
-    // challenge.time_to_complete = time;
     challenge.course_url = url;
     challenge.required_resources = required;
 
@@ -135,7 +133,6 @@ export async function addChallenges(connection, data) {
   const feature_table_ids = {};
   let block_id = 1;
   let superblock_id = 1;
-  let block_time_to_complete_id = 1;
   let block_is_upcoming_id = 1;
   let uses_multifile_editor_id = 1;
   let c = 1;
@@ -155,7 +152,6 @@ export async function addChallenges(connection, data) {
 
       __typename,
       description,
-      time,
       required,
       url,
       ...challenge
@@ -164,7 +160,6 @@ export async function addChallenges(connection, data) {
 
     // SPECIAL CASES
     challenge.descriptions = description;
-    // challenge.time_to_complete = time;
     challenge.course_url = url;
     challenge.required_resources = required;
 
@@ -190,16 +185,7 @@ export async function addChallenges(connection, data) {
       blockSet.add(block);
       block_to_block_id_map.set(block, block_id);
 
-      // Add `block_time_to_complete` and `block_is_upcoming` as special case, because it is per-block
-      if (time) {
-        await insert(
-          connection,
-          'block_time_to_complete',
-          ['id', 'block_id', 'time_to_complete'],
-          [block_time_to_complete_id++, block_id, time]
-        );
-      }
-
+      // Add `block_is_upcoming` as special case because it is per-block
       if (getBlockIsUpcoming(block)) {
         await insert(
           connection,

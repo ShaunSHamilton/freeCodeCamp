@@ -120,7 +120,6 @@ export const allChallengeNode = gql`
             testString
             text
           }
-          time
           title
           url
           videoId

@@ -55,14 +55,6 @@ CREATE TABLE IF NOT EXISTS blocks_challenges(
   FOREIGN KEY (challenge_id) REFERENCES challenges(id)
 );
 
-CREATE TABLE IF NOT EXISTS block_time_to_complete(
-  id INT NOT NULL AUTO_INCREMENT,
-  block_id INT NOT NULL,
-  time_to_complete TEXT NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (block_id) REFERENCES blocks(id)
-);
-
 CREATE TABLE IF NOT EXISTS block_is_upcoming(
   id INT NOT NULL AUTO_INCREMENT,
   block_id INT NOT NULL,
