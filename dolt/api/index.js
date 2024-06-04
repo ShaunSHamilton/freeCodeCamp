@@ -277,8 +277,6 @@ async function fetchCurriculumFromDB() {
           ? fixAssignments(challenge.assignments)
           : [],
         tests: challenge.tests ? fixTests(challenge.tests) : [],
-        // come back to required and template after https://github.com/freeCodeCamp/freeCodeCamp/pull/55002
-        // and required after https://www.dolthub.com/repositories/sky020/curriculum/pulls/10
         required: challenge.required ? challenge.required : [],
 
         // false for all English, come back to this for i18n
@@ -360,6 +358,7 @@ async function fetchCurriculumFromDB() {
 fetchCurriculumFromDB();
 
 // TODO: Add logic for fetching specific language
+// TODO: Add logic for removing upcoming blocks
 app.get('/curriculum', (req, res) => {
   const { lang = 'english' } = req.query;
   console.log(`Someone is trying to get the ${lang} curriculum!`);
