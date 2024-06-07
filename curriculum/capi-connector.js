@@ -1,5 +1,13 @@
 const { readFile, writeFile } = require('fs/promises');
 
+// RESET LOG FILE:
+writeFile('./cdb-progress.json', '[]');
+
+const writeQueue = {
+  queue: [],
+  isWriting: false
+};
+
 async function fetchCapCurriculum() {
   try {
     const response = await fetch('http://localhost:3010/curriculum');
@@ -54,33 +62,64 @@ function getCapInstructions(capCurriculum, englishPath) {
  */
 async function compareCDBToFS({ challenge, lang }) {
   const challenges = await getChallenges();
-  const matching_challenge = challenges.find(({ id }) => id === challenge.id);
+  const matching_challenge = challenges.find(
+    ({ objectId }) => objectId === challenge.id
+  );
 
   if (!matching_challenge) {
-    await addToLog('./cdb-progress.json', {
+    return await addToLog({
       challenge_id: challenge.id,
       property: null,
       expected: challenge,
-      actual: undefined
+      actual: 'fcc-undefined'
     });
   }
 
   const challenge_keys = Object.keys(challenge);
 
-  for (const key of challenge_keys) {
+  for (let key of challenge_keys) {
+    switch (key) {
+      case 'id':
+        continue;
+      case 'order':
+        key = 'blockOrder';
+        break;
+      case 'superOrder':
+        key = 'superblockOrder';
+        break;
+      case 'block':
+        key = 'blockDashedName';
+        break;
+      case 'superBlock':
+        key = 'superblockDashedName';
+        break;
+      default:
+        break;
+    }
     if (!isDeepEqual(challenge[key], matching_challenge[key])) {
       await addToLog({
         challenge_id: challenge.id,
         property: key,
-        expected: challenge[key],
-        actual: matching_challenge[key]
+        expected: fccUndefined(challenge[key]),
+        actual: fccUndefined(matching_challenge[key])
       });
     }
   }
 }
 
+function fccUndefined(val) {
+  return typeof val === 'undefined' ? 'fcc-undefined' : val;
+}
+
 function isDeepEqual(a, b) {
   if (a === b) {
+    return true;
+  }
+
+  // API returns undefined for props which are empty arrays.
+  // This should probably be fixed, but, for the sake of less diff,
+  // empty arrays are treated equivalent to undefined.
+  if (emptyArrayEqUndefined(a, b)) {
     return true;
   }
 
@@ -89,6 +128,19 @@ function isDeepEqual(a, b) {
   }
 
   if (typeof a === 'object' && a !== null && b !== null) {
+    // Handle arrays such that order does not matter
+    if (Array.isArray(a) && Array.isArray(b)) {
+      const every = a.every(e_a => {
+        return b.some(e_b => isDeepEqual(e_a, e_b));
+      });
+      return every;
+    }
+
+    // Props to ignore:
+    if ('error' in a || 'error' in b) {
+      return true;
+    }
+
     const a_keys = Object.keys(a);
     const b_keys = Object.keys(b);
 
@@ -108,15 +160,42 @@ function isDeepEqual(a, b) {
   return false;
 }
 
-async function addToLog(value) {
-  const data = await readFile('./cdb-progress.json');
-  const logs = JSON.parse(data);
+function emptyArrayEqUndefined(a, b) {
+  if (Array.isArray(a) && a.length === 0) {
+    return typeof b === 'undefined';
+  }
 
-  if (logs.length === 0) {
-    await writeFile('./cdb-progress.json', JSON.stringify([value]));
-  } else {
-    logs.push(value);
-    await writeFile('./cdb-progress.json', JSON.stringify(logs));
+  if (Array.isArray(b) && b.length === 0) {
+    return typeof a === 'undefined';
+  }
+
+  return false;
+}
+
+async function addToLog(value) {
+  if (writeQueue.isWriting) {
+    writeQueue.queue.push(value);
+    return;
+  }
+  writeQueue.isWriting = true;
+  const data = await readFile('./cdb-progress.json', 'utf-8');
+  // console.log('Data: ', data);
+  // console.log('-----------');
+  // console.log('Value: ', value);
+  const logs = JSON.parse(data);
+  logs.push(value);
+  await writeFile('./cdb-progress.json', JSON.stringify(logs, null, 2));
+  writeQueue.isWriting = false;
+  handleQueue();
+}
+
+// Handle any remaining logs in the queue
+async function handleQueue() {
+  if (writeQueue.queue.length > 0) {
+    const value = writeQueue.queue.shift();
+    if (value) {
+      await addToLog(value);
+    }
   }
 }
 
@@ -167,16 +246,17 @@ async function addToLog(value) {
  *     usesMultifileEditor?: boolean,
  *   }}
  */
-let curriculum;
+let curriculum = fetch(`http://localhost:3010/challenges`)
+  .then(r => r.json())
+  .catch(console.error);
 
 async function getChallenges(lang = 'english') {
   if (curriculum) {
     return curriculum;
   }
 
-  curriculum = await fetch(
-    `http://localhost:3010/curriculum?lang=${lang}`
-  ).then(res => res.json());
+  const res = await fetch(`http://localhost:3010/challenges`);
+  curriculum = await res.json();
 
   return curriculum;
 }

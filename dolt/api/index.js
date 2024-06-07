@@ -2,6 +2,7 @@
 import { writeFileSync } from 'fs';
 import express from 'express';
 import { createConnection } from 'mysql';
+import * as marked from 'marked';
 import {
   maybeJson,
   fixSolutions,
@@ -49,6 +50,16 @@ let curriculum = {
     blocks: {}
   }
 };
+
+const markdownProps = [
+  'description',
+  'instructions',
+  'text',
+  'answer',
+  'feedback',
+  'sentence',
+  'assignments'
+];
 
 async function fetchCurriculumFromDB() {
   console.log('Fetching challenge data from database...');
@@ -358,9 +369,29 @@ app.get('/curriculum', (req, res) => {
 });
 
 app.get('/challenges', (req, res) => {
-  console.log('Someone is trying to get the challenges!');
+  const { html } = req.query;
+  if (html === 'true') {
+    challengesArray.forEach(challenge => {
+      markdownToHtml(challenge);
+    });
+  }
   res.json(challengesArray);
 });
+
+// Recurse to markdownize values that need it
+function markdownToHtml(val) {
+  for (const prop in val) {
+    if (markdownProps.includes(prop)) {
+      if (typeof val[prop] !== 'string') {
+        // console.log('Markdown prop is not a string:', val[prop]);
+        continue;
+      }
+      val[prop] = marked.parse(val[prop]).trimEnd();
+    } else if (typeof val[prop] === 'object' && val[prop] !== null) {
+      markdownToHtml(val[prop]);
+    }
+  }
+}
 
 app.get('/superblock-map', async (req, res) => {
   const query = `SELECT title, dashed_name FROM superblocks ORDER BY superblock_order;`;
