@@ -15,11 +15,7 @@ import { E44o5 } from './components/error';
 import './index.css';
 
 // Dynamically construct the socket url based on `window.location`
-let socket = new WebSocket(
-  `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${
-    window.location.host
-  }/ws`
-);
+let socket = new WebSocket(`ws://localhost:7002/ws`);
 
 export const FreeCodeCampOSFrame = () => {
   const [project, setProject] = useState<ProjectI | null>(null);

@@ -1,14 +1,14 @@
 .card {
   padding: 2em;
 }
-
+/* 
 @font-face {
   font-family: 'Lato';
   src: url('./assets/Lato-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
   font-display: fallback;
-}
+} */
 
 * {
   color: var(--light-2);
@@ -18,7 +18,7 @@ body {
   background-color: var(--dark-2);
   margin: 0;
   text-align: center;
-  font-family: 'Lato', sans-serif;
+  /* font-family: 'Lato', sans-serif; */
   font-weight: 400;
 }
 button {
