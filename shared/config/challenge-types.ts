@@ -1,7 +1,6 @@
 const html = 0;
 const js = 1;
 const backend = 2;
-const zipline = 3;
 const frontEndProject = 3;
 const backEndProject = 4;
 const jsProject = 5;
@@ -28,7 +27,6 @@ export const challengeTypes = {
   html,
   js,
   backend,
-  zipline,
   frontEndProject,
   backEndProject,
   pythonProject,
@@ -50,12 +48,11 @@ export const challengeTypes = {
   dialogue,
   fillInTheBlank,
   multifilePythonCertProject
-};
+} as const;
 
 export const hasNoSolution = (challengeType: number): boolean => {
   const noSolutions = [
     backend,
-    zipline,
     frontEndProject,
     backEndProject,
     step,
