@@ -1,5 +1,5 @@
 const path = require('path');
-
+const { writeFileSync } = require('fs');
 const _ = require('lodash');
 
 const envData = require('../config/env.json');
@@ -47,6 +47,10 @@ exports.replaceChallengeNode = () => {
 
 exports.buildChallenges = async function buildChallenges() {
   const curriculum = await getChallengesForLang(curriculumLocale);
+  writeFileSync(
+    `../dolt/api/learn-curriculum.json`,
+    JSON.stringify(curriculum, null, 2)
+  );
   const superBlocks = Object.keys(curriculum);
   const blocks = superBlocks
     .map(superBlock => curriculum[superBlock].blocks)
