@@ -19,6 +19,8 @@ const { createPoly } = require('../shared/utils/polyvinyl');
 const { getSuperOrder, getSuperBlockFromDir } = require('./utils');
 const { metaSchemaValidator } = require('./schema/meta-schema');
 
+// const { compareCDBToFS } = require('./capi-connector');
+
 const access = util.promisify(fs.access);
 
 const ENGLISH_CHALLENGES_DIR = path.resolve(__dirname, 'challenges');
@@ -348,6 +350,8 @@ function generateChallengeCreator(lang, englishPath, i18nPath) {
     challenge.translationPending = lang !== 'english' && !isAudited;
     addMetaToChallenge(challenge, meta);
     fixChallengeProperties(challenge);
+
+    // await compareCDBToFS({ challenge, lang });
 
     return challenge;
   }

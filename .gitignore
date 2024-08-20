@@ -209,3 +209,10 @@ curriculum/build
 ### Playwright ###
 
 /playwright
+
+### Dolt ###
+.sqlhistory
+.dolt*
+dolt/api/curriculum.json
+dolt/api/learn-curriculum.json
+dolt/api/mobile-curriculum.json
