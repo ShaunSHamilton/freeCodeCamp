@@ -1,8 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
-import fastifySentry from '@immobiliarelabs/fastify-sentry';
 import fp from 'fastify-plugin';
 
-import { SENTRY_DSN, SENTRY_ENVIRONMENT } from '../utils/env';
 import { getRedirectParams } from '../utils/redirection';
 
 /**
@@ -13,37 +11,30 @@ import { getRedirectParams } from '../utils/redirection';
  * @param done Callback to signal that the logic has completed.
  */
 const errorHandling: FastifyPluginCallback = (fastify, _options, done) => {
-  void fastify.register(fastifySentry, {
-    dsn: SENTRY_DSN,
-    environment: SENTRY_ENVIRONMENT,
-    maxValueLength: 8192, // the default is 250, which is too small.
-    // No need to initialize if DSN is not provided (e.g. in development and
-    // test environments)
-    skipInit: !SENTRY_DSN,
-    errorResponse: (error, request, reply) => {
-      const accepts = request.accepts().type(['json', 'html']);
-      const isCSRFError =
-        error.code === 'FST_CSRF_INVALID_TOKEN' ||
-        error.code === 'FST_CSRF_MISSING_SECRET';
+  fastify.setErrorHandler(async (error, request, reply) => {
+    const accepts = request.accepts().type(['json', 'html']);
+    const isCSRFError =
+      error.code === 'FST_CSRF_INVALID_TOKEN' ||
+      error.code === 'FST_CSRF_MISSING_SECRET';
 
-      const { returnTo } = getRedirectParams(request);
+    const { returnTo } = getRedirectParams(request);
 
-      const message =
-        reply.statusCode === 500 || isCSRFError
-          ? 'flash.generic-error'
-          : error.message;
-      if (accepts === 'json') {
-        void reply.send({
-          message,
-          type: 'danger'
-        });
-      } else {
-        void reply.status(302);
-        void reply.redirectWithMessage(returnTo, {
-          type: 'danger',
-          content: message
-        });
-      }
+    const message =
+      reply.statusCode === 500 || isCSRFError
+        ? 'flash.generic-error'
+        : error.message;
+    if (accepts === 'json') {
+      void reply.code(500);
+      void reply.send({
+        message,
+        type: 'danger'
+      });
+    } else {
+      void reply.status(302);
+      void reply.redirectWithMessage(returnTo, {
+        type: 'danger',
+        content: message
+      });
     }
   });
 

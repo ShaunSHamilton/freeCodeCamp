@@ -392,7 +392,7 @@ export const challengeRoutes: FastifyPluginCallbackTypebox = (
         !multifilePythonCertProjectIds.includes(challengeId)
       ) {
         return void reply
-          .code(400)
+          .code(403)
           .send('That challenge type is not saveable.');
       }
 

@@ -3,7 +3,7 @@ import { profileUI, examResults, savedChallenge } from '../../types';
 
 export const getPublicProfile = {
   querystring: Type.Object({
-    username: Type.String({ minLength: 1 })
+    username: Type.Optional(Type.String({ minLength: 1 }))
   }),
   response: {
     200: Type.Object({

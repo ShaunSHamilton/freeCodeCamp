@@ -2,6 +2,7 @@ import fastifyAccepts from '@fastify/accepts';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import type { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
+import * as Sentry from '@sentry/node';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import uriResolver from 'fast-uri';
@@ -39,13 +40,21 @@ import {
   FCC_ENABLE_SWAGGER_UI,
   FCC_ENABLE_SHADOW_CAPTURE,
   FCC_ENABLE_EXAM_ENVIRONMENT,
-  FCC_ENABLE_SENTRY_ROUTES
+  FCC_ENABLE_SENTRY_ROUTES,
+  SENTRY_DSN,
+  SENTRY_ENVIRONMENT
 } from './utils/env';
 import { isObjectID } from './utils/validation';
 import {
   examEnvironmentOpenRoutes,
   examEnvironmentValidatedTokenRoutes
 } from './exam-environment/routes/exam-environment';
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    Sentry: typeof Sentry;
+  }
+}
 
 type FastifyInstanceWithTypeProvider = FastifyInstance<
   RawServerDefault,
@@ -74,6 +83,14 @@ ajv.addFormat('objectid', {
   validate: (str: string) => isObjectID(str)
 });
 
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    environment: SENTRY_ENVIRONMENT,
+    maxValueLength: 8192 // the default is 250, which is too small.
+  });
+}
+
 /**
  * Top-level wrapper to instantiate the API server. This is where all middleware and
  * routes should be mounted.
@@ -87,6 +104,9 @@ export const build = async (
   // TODO: Old API returns 403s for failed validation. We now return 400 (default) from AJV.
   // Watch when implementing in client
   const fastify = Fastify(options).withTypeProvider<TypeBoxTypeProvider>();
+
+  Sentry.setupFastifyErrorHandler(fastify);
+  void fastify.decorate('Sentry', Sentry);
 
   fastify.setValidatorCompiler(({ schema }) => ajv.compile(schema));
 
@@ -149,7 +169,6 @@ export const build = async (
       // TODO: bounce unauthed requests before checking CSRF token. This will
       // mean moving csrfProtection into custom plugin and testing separately,
       // because it's a pain to mess around with other cookies/hook order.
-      // @ts-expect-error - @fastify/csrf-protection needs to update their types
       // eslint-disable-next-line @typescript-eslint/unbound-method
       fastify.addHook('onRequest', fastify.csrfProtection);
       fastify.addHook('onRequest', fastify.send401IfNoUser);
