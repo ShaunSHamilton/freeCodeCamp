@@ -141,7 +141,8 @@
   "pnpm": {
     "patchedDependencies": {
       "@fastify/oauth2@7.8.1": "patches/@fastify__oauth2@7.8.1.patch",
-      "@fastify/csrf-protection@6.4.1": "patches/@fastify__csrf-protection@6.4.1.patch"
+      "@fastify/csrf-protection@6.4.1": "patches/@fastify__csrf-protection@6.4.1.patch",
+      "@codesandbox/sandpack-react": "patches/@codesandbox__sandpack-react.patch"
     },
     "peerDependencyRules": {
       "allowedVersions": {

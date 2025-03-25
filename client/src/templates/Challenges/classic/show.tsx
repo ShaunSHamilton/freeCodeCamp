@@ -73,6 +73,7 @@ import { mergeChallengeFiles } from './saved-challenges';
 
 import './classic.css';
 import '../components/test-frame.css';
+import { challengeFilesToFiles, Sand, SandpackEditor } from './sandpack/editor';
 
 const mapStateToProps = (state: unknown) => ({
   challengeFiles: challengeFilesSelector(state) as ChallengeFiles,
@@ -422,25 +423,29 @@ function ShowClassic({
     isMobileLayout,
     isUsingKeyboardInTablist
   }: RenderEditorArgs) => {
-    return (
-      challengeFiles && (
-        <MultifileEditor
-          challengeFiles={challengeFiles}
-          block={block}
-          superBlock={superBlock}
-          containerRef={containerRef}
-          description={description}
-          editorRef={editorRef}
-          initialTests={tests}
-          isMobileLayout={isMobileLayout}
-          isUsingKeyboardInTablist={isUsingKeyboardInTablist}
-          resizeProps={resizeProps}
-          title={title}
-          usesMultifileEditor={usesMultifileEditor}
-          showProjectPreview={demoType === 'onLoad'}
-        />
-      )
-    );
+    if (!challengeFiles) {
+      return null;
+    }
+    return <Sand challengeFiles={challengeFiles} />;
+    // return (
+    //   challengeFiles && (
+    //     <MultifileEditor
+    //       challengeFiles={challengeFiles}
+    //       block={block}
+    //       superBlock={superBlock}
+    //       containerRef={containerRef}
+    //       description={description}
+    //       editorRef={editorRef}
+    //       initialTests={tests}
+    //       isMobileLayout={isMobileLayout}
+    //       isUsingKeyboardInTablist={isUsingKeyboardInTablist}
+    //       resizeProps={resizeProps}
+    //       title={title}
+    //       usesMultifileEditor={usesMultifileEditor}
+    //       showProjectPreview={demoType === 'onLoad'}
+    //     />
+    //   )
+    // );
   };
 
   return (

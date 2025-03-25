@@ -242,12 +242,17 @@ const DesktopLayout = (props: DesktopLayoutProps): JSX.Element => {
     challengeType === challengeTypes.multifilePythonCertProject ||
     challengeType === challengeTypes.lab ||
     challengeType === challengeTypes.jsLab;
-  const isProjectStyle = projectBasedChallenge || isMultifileProject;
-  const displayPreviewPane = hasPreview && showPreviewPane;
-  const displayPreviewPortal = hasPreview && showPreviewPortal;
+  // const isProjectStyle = projectBasedChallenge || isMultifileProject;
+  const isProjectStyle = false;
+  // const displayPreviewPane = hasPreview && showPreviewPane;
+  const displayPreviewPane = false;
+  // const displayPreviewPortal = hasPreview && showPreviewPortal;
+  const displayPreviewPortal = false;
   const displayNotes = projectBasedChallenge ? showNotes && !!notes : false;
-  const displayEditorConsole = !isProjectStyle;
-  const displayPreviewConsole = !displayEditorConsole && showConsole;
+  // const displayEditorConsole = !isProjectStyle;
+  const displayEditorConsole = false;
+  // const displayPreviewConsole = !displayEditorConsole && showConsole;
+  const displayPreviewConsole = false;
 
   const {
     codePane,
@@ -263,7 +268,7 @@ const DesktopLayout = (props: DesktopLayoutProps): JSX.Element => {
 
   return (
     <div className='desktop-layout' data-playwright-test-label='desktop-layout'>
-      {isProjectStyle && (
+      {/* {
         <ActionRow
           hasPreview={hasPreview}
           hasNotes={!!notes}
@@ -276,12 +281,12 @@ const DesktopLayout = (props: DesktopLayoutProps): JSX.Element => {
           togglePane={togglePane}
           data-playwright-test-label='action-row'
         />
-      )}
+      } */}
       <ReflexContainer
         orientation='vertical'
         data-playwright-test-label='main-container'
       >
-        {!projectBasedChallenge && showInstructions && (
+        {showInstructions && (
           <ReflexElement
             flex={instructionPane.flex}
             {...resizeProps}
@@ -291,7 +296,7 @@ const DesktopLayout = (props: DesktopLayoutProps): JSX.Element => {
             {instructions}
           </ReflexElement>
         )}
-        {!projectBasedChallenge && showInstructions && (
+        {showInstructions && (
           <ReflexSplitter propagate={true} {...resizeProps} />
         )}
 

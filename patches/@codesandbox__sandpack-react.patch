@@ -1,0 +1,77 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 62e2cb8c1af02e97084ac178ef81e72ffdec3f7c..bfb448d5e03c51eb2b9c2fa21d4b2d442c80a3d2 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -2,7 +2,7 @@
+ 
+ import { jsxs, jsx, Fragment } from 'react/jsx-runtime';
+ import * as React from 'react';
+-import { createContext, useContext, useState, useId, useRef, useCallback, useEffect, createElement, forwardRef } from 'react';
++import { createContext, useContext, useState, useRef, useCallback, useEffect, createElement, forwardRef } from 'react';
+ import { createStitches } from '@stitches/core';
+ import { dequal } from 'dequal';
+ import { normalizePath, addPackageJSONIfNeeded, loadSandpackClient, extractErrorDetails } from '@codesandbox/sandpack-client';
+@@ -415,7 +415,7 @@ var ClassNamesProvider = function (_a) {
+ };
+ var useClassNames = function () {
+     var contextClassNames = useContext(ClassNamesContext);
+-    return function sandpackClassNames(customClassName, 
++    return function sandpackClassNames(customClassName,
+     /* eslint-disable @typescript-eslint/no-explicit-any */
+     allClassNames) {
+         if (allClassNames === void 0) { allClassNames = []; }
+@@ -1540,14 +1540,9 @@ var useAppState = function (props, files) {
+ };
+ 
+ var useSandpackId = function () {
+-    if (typeof useId === "function") {
+-        /* eslint-disable-next-line */
+-        return useId();
+-    }
+-    else {
++
+         return generateRandomId();
+-    }
+-};
++    };
+ /**
+  * This is a hard constraint to make URLs shorter.
+  * For example, this id will be used to mount SW in the iframe
+@@ -1556,28 +1551,7 @@ var useSandpackId = function () {
+ var MAX_ID_LENGTH = 9;
+ var sandpackClientVersion = "2.19.8";
+ var useAsyncSandpackId = function (files) {
+-    if (typeof useId === "function") {
+-        /* eslint-disable-next-line react-hooks/rules-of-hooks */
+-        var reactDomId_1 = useId();
+-        return function () { return __awaiter(void 0, void 0, void 0, function () {
+-            var allCode, sha;
+-            return __generator(this, function (_a) {
+-                switch (_a.label) {
+-                    case 0:
+-                        allCode = Object.entries(files)
+-                            .map(function (path, code) { return path + "|" + code; })
+-                            .join("|||");
+-                        return [4 /*yield*/, generateShortId(allCode + reactDomId_1 + sandpackClientVersion)];
+-                    case 1:
+-                        sha = _a.sent();
+-                        return [2 /*return*/, ensureLength(sha.replace(/:/g, "sp").replace(/[^a-zA-Z]/g, ""), MAX_ID_LENGTH)];
+-                }
+-            });
+-        }); };
+-    }
+-    else {
+         return function () { return ensureLength(generateRandomId(), MAX_ID_LENGTH); };
+-    }
+ };
+ function ensureLength(str, length) {
+     if (str.length > length) {
+@@ -2740,7 +2714,7 @@ var useCombinedRefs = function () {
+             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+             ref.current = element;
+         });
+-    }, 
++    },
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+     refs);
+ };
