@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import {
   SandpackCodeEditor,
-  SandpackFileExplorer,
+  // SandpackFileExplorer,
   SandpackFiles,
   SandpackLayout,
   SandpackPreview,
@@ -12,6 +12,8 @@ import { CodeMirrorRef } from '@codesandbox/sandpack-react/components/CodeEditor
 import { EditorView, Decoration, DecorationSet } from '@codemirror/view';
 import { StateField, StateEffect, Range } from '@codemirror/state';
 import { ChallengeFiles } from '../../../../redux/prop-types';
+
+import './style.css';
 
 interface SandpackEditorProps {
   challengeFiles: NonNullable<ChallengeFiles>;
@@ -43,17 +45,18 @@ export function SandpackEditor({ challengeFiles }: SandpackEditorProps) {
   const { activeFile } = sandpack;
 
   useEffect(() => {
+    const challengeFile = fileNameToChallengeFile(activeFile, challengeFiles);
+    console.log(challengeFile.editableRegionBoundaries);
+    if (!challengeFile.editableRegionBoundaries) return;
+
     // Getting CodeMirror instance
     const instance = cmInstance.current?.getCodemirror();
-    console.log(instance);
+    console.log(instance, activeFile);
 
     if (!instance) return;
 
     // Based on `challengeFiles.editableRegionBoundaries`, add a blue border to
     // the top of the line[0] and the bottom of the line[1] in the editor
-    const challengeFile = fileNameToChallengeFile(activeFile, challengeFiles);
-    console.log(challengeFile.editableRegionBoundaries);
-    if (!challengeFile.editableRegionBoundaries) return;
     const [top, bottom] = challengeFile.editableRegionBoundaries;
 
     const decorations: Range<Decoration>[] = [];
@@ -97,10 +100,12 @@ export function SandpackEditor({ challengeFiles }: SandpackEditorProps) {
 
   return (
     <>
-      <SandpackFileExplorer />
+      {/* <SandpackFileExplorer /> */}
       <SandpackCodeEditor
         ref={cmInstance}
         extensions={[editableRegionDecoration]}
+        showTabs={true}
+        closableTabs={false}
       />
       <SandpackPreview />
     </>
@@ -113,13 +118,8 @@ export function Sand({ challengeFiles }: SandpackEditorProps) {
       files={challengeFilesToFiles(challengeFiles)}
       theme='auto'
       template='static'
-      options={{
-        classes: {
-          'sp-layout-height': '100%'
-        }
-      }}
     >
-      <SandpackLayout style={{ height: '100%' }}>
+      <SandpackLayout>
         <SandpackEditor challengeFiles={challengeFiles} />
       </SandpackLayout>
     </SandpackProvider>
@@ -133,10 +133,11 @@ export function challengeFilesToFiles(
     return {
       ...acc,
       [`/${file.name}.${file.ext}`]: {
-        code: file.contents
+        code: file.contents,
+        active: !!file.editableRegionBoundaries?.length
       }
     };
-  }, {});
+  }, {} as SandpackFiles);
 
   files['/package.json'] = {
     code: JSON.stringify({

@@ -29,7 +29,6 @@ import {
   ChallengeFiles,
   Dimensions,
   FileKey,
-  ResizeProps,
   Test
 } from '../../../redux/prop-types';
 import { editorToneOptions } from '../../../utils/tone/editor-config';
@@ -95,7 +94,6 @@ export interface EditorProps {
   isUsingKeyboardInTablist: boolean;
   openHelpModal: () => void;
   openResetModal: () => void;
-  resizeProps: ResizeProps;
   saveChallenge: () => void;
   saveEditorContent: () => void;
   setEditorFocusability: (isFocusable: boolean) => void;

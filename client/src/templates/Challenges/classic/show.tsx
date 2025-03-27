@@ -426,26 +426,26 @@ function ShowClassic({
     if (!challengeFiles) {
       return null;
     }
-    return <Sand challengeFiles={challengeFiles} />;
-    // return (
-    //   challengeFiles && (
-    //     <MultifileEditor
-    //       challengeFiles={challengeFiles}
-    //       block={block}
-    //       superBlock={superBlock}
-    //       containerRef={containerRef}
-    //       description={description}
-    //       editorRef={editorRef}
-    //       initialTests={tests}
-    //       isMobileLayout={isMobileLayout}
-    //       isUsingKeyboardInTablist={isUsingKeyboardInTablist}
-    //       resizeProps={resizeProps}
-    //       title={title}
-    //       usesMultifileEditor={usesMultifileEditor}
-    //       showProjectPreview={demoType === 'onLoad'}
-    //     />
-    //   )
-    // );
+    const USE_SANDPACK_EDITOR = true;
+    return USE_SANDPACK_EDITOR ? (
+      <Sand challengeFiles={challengeFiles} />
+    ) : (
+      <MultifileEditor
+        challengeFiles={challengeFiles}
+        block={block}
+        superBlock={superBlock}
+        containerRef={containerRef}
+        description={description}
+        editorRef={editorRef}
+        initialTests={tests}
+        isMobileLayout={isMobileLayout}
+        isUsingKeyboardInTablist={isUsingKeyboardInTablist}
+        resizeProps={resizeProps}
+        title={title}
+        usesMultifileEditor={usesMultifileEditor}
+        showProjectPreview={demoType === 'onLoad'}
+      />
+    );
   };
 
   return (

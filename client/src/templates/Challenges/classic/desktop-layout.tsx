@@ -313,7 +313,7 @@ const DesktopLayout = (props: DesktopLayoutProps): JSX.Element => {
             >
               <ReflexElement
                 name='codePane'
-                {...(displayEditorConsole && { flex: codePane.flex })}
+                flex={displayEditorConsole ? codePane.flex : undefined}
                 {...reflexProps}
                 {...resizeProps}
               >
@@ -369,7 +369,7 @@ const DesktopLayout = (props: DesktopLayoutProps): JSX.Element => {
               {displayPreviewConsole && (
                 <ReflexElement
                   name='testsPane'
-                  {...(displayPreviewPane && { flex: testsPane.flex })}
+                  flex={displayPreviewPane ? testsPane.flex : undefined}
                   {...resizeProps}
                 >
                   {testOutput}

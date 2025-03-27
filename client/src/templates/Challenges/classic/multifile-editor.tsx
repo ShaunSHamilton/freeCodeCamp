@@ -10,7 +10,7 @@ import {
 } from '../redux/selectors';
 import { getTargetEditor } from '../utils/get-target-editor';
 import './editor.css';
-import { FileKey } from '../../../redux/prop-types';
+import { FileKey, ResizeProps } from '../../../redux/prop-types';
 import Editor, { type EditorProps } from './editor';
 
 export type VisibleEditors = {
@@ -26,7 +26,6 @@ type MultifileEditorProps = Pick<
   | 'usesMultifileEditor'
   | 'showProjectPreview'
   | 'title'
-  | 'resizeProps'
   | 'isUsingKeyboardInTablist'
   | 'isMobileLayout'
   | 'initialTests'
@@ -39,6 +38,7 @@ type MultifileEditorProps = Pick<
   // We use dimensions to trigger a re-render of the editor
   | 'dimensions'
 > & {
+  resizeProps: ResizeProps;
   visibleEditors: VisibleEditors;
 };
 
@@ -150,7 +150,6 @@ const MultifileEditor = (props: MultifileEditorProps) => {
                     initialTests={initialTests}
                     isMobileLayout={isMobileLayout}
                     isUsingKeyboardInTablist={isUsingKeyboardInTablist}
-                    resizeProps={resizeProps}
                     dimensions={props.dimensions ?? { height: 0, width: 0 }}
                     title={title}
                     usesMultifileEditor={usesMultifileEditor}
