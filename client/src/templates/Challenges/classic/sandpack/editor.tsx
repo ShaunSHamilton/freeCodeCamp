@@ -11,13 +11,15 @@ import {
 import { CodeMirrorRef } from '@codesandbox/sandpack-react/components/CodeEditor/CodeMirror';
 import { EditorView, Decoration, DecorationSet } from '@codemirror/view';
 import { StateField, StateEffect, Range } from '@codemirror/state';
+import { connect } from 'react-redux';
 import { ChallengeFiles } from '../../../../redux/prop-types';
+import { updateFile } from '../../redux/actions';
 
 import './style.css';
 
-interface SandpackEditorProps {
+type SandpackEditorProps = {
   challengeFiles: NonNullable<ChallengeFiles>;
-}
+} & typeof mapDispatchToProps;
 
 const editableRegionDecoration = StateField.define<DecorationSet>({
   create() {
@@ -39,19 +41,21 @@ const editableRegionDecoration = StateField.define<DecorationSet>({
 
 const setEditableRegionDecorations = StateEffect.define<DecorationSet>();
 
-export function SandpackEditor({ challengeFiles }: SandpackEditorProps) {
+const mapDispatchToProps = {
+  updateFile
+};
+
+function SandpackEditor({ challengeFiles, updateFile }: SandpackEditorProps) {
   const cmInstance = useRef<CodeMirrorRef>(null);
   const { sandpack } = useSandpack();
-  const { activeFile } = sandpack;
+  const { activeFile, files } = sandpack;
 
-  useEffect(() => {
+  function addEditableRegionDecorations() {
     const challengeFile = fileNameToChallengeFile(activeFile, challengeFiles);
-    console.log(challengeFile.editableRegionBoundaries);
     if (!challengeFile.editableRegionBoundaries) return;
 
     // Getting CodeMirror instance
     const instance = cmInstance.current?.getCodemirror();
-    console.log(instance, activeFile);
 
     if (!instance) return;
 
@@ -81,13 +85,13 @@ export function SandpackEditor({ challengeFiles }: SandpackEditorProps) {
 
     const style = document.createElement('style');
     style.innerHTML = `
-      .editable-region-border-top {
-        border-top: 2px solid blue;
+    .editable-region-border-top {
+      border-top: 2px solid blue;
       }
       .editable-region-border-bottom {
         border-bottom: 2px solid blue;
-      }
-    `;
+        }
+        `;
     document.head.appendChild(style);
 
     return () => {
@@ -96,7 +100,23 @@ export function SandpackEditor({ challengeFiles }: SandpackEditorProps) {
       });
       document.head.removeChild(style);
     };
-  }, [activeFile, challengeFiles]);
+  }
+
+  useEffect(addEditableRegionDecorations, [activeFile, challengeFiles]);
+
+  useEffect(() => {
+    const challengeFile = fileNameToChallengeFile(activeFile, challengeFiles);
+    const fileKey = activeFileToFileKey(activeFile);
+    // TODO: Update editable regions on change.
+    const editableRegionBoundaries = challengeFile?.editableRegionBoundaries;
+    updateFile({
+      fileKey,
+      editableRegionBoundaries,
+      editorValue: files[activeFile].code
+    });
+    // TODO: Figure out how to update file without causing infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files[activeFile].code, updateFile]);
 
   return (
     <>
@@ -112,7 +132,7 @@ export function SandpackEditor({ challengeFiles }: SandpackEditorProps) {
   );
 }
 
-export function Sand({ challengeFiles }: SandpackEditorProps) {
+export function Sand({ challengeFiles, updateFile }: SandpackEditorProps) {
   return (
     <SandpackProvider
       files={challengeFilesToFiles(challengeFiles)}
@@ -120,7 +140,7 @@ export function Sand({ challengeFiles }: SandpackEditorProps) {
       template='static'
     >
       <SandpackLayout>
-        <SandpackEditor challengeFiles={challengeFiles} />
+        <SandpackEditor {...{ challengeFiles, updateFile }} />
       </SandpackLayout>
     </SandpackProvider>
   );
@@ -162,3 +182,13 @@ function fileNameToChallengeFile(
   }
   return file;
 }
+
+function activeFileToFileKey(activeFile: string): string {
+  const fileKey = activeFile.split('/').at(-1)?.replace('.', '');
+  if (!fileKey) {
+    throw new Error(`File ${activeFile} not valid fileKey format`);
+  }
+  return fileKey;
+}
+
+export const SandEditor = connect(undefined, mapDispatchToProps)(Sand);

@@ -100,6 +100,7 @@ export const reducer = handleActions(
           editorValue,
           editableRegionBoundaries
         );
+      console.log(updates);
       return {
         ...state,
         challengeFiles: state.challengeFiles.map(challengeFile =>

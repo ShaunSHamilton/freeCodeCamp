@@ -73,7 +73,7 @@ import { mergeChallengeFiles } from './saved-challenges';
 
 import './classic.css';
 import '../components/test-frame.css';
-import { challengeFilesToFiles, Sand, SandpackEditor } from './sandpack/editor';
+import { SandEditor } from './sandpack/editor';
 
 const mapStateToProps = (state: unknown) => ({
   challengeFiles: challengeFilesSelector(state) as ChallengeFiles,
@@ -428,7 +428,7 @@ function ShowClassic({
     }
     const USE_SANDPACK_EDITOR = true;
     return USE_SANDPACK_EDITOR ? (
-      <Sand challengeFiles={challengeFiles} />
+      <SandEditor challengeFiles={challengeFiles} />
     ) : (
       <MultifileEditor
         challengeFiles={challengeFiles}
