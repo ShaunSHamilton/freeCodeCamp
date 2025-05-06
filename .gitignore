@@ -208,3 +208,6 @@ curriculum/build
 
 ### Shadow Testing Log Files Folder ###
 api/logs/
+
+### Rust ###
+target/

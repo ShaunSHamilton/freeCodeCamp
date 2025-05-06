@@ -1,0 +1,14 @@
+[package]
+name = "exam-moderation-service"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = "0.4.41"
+dotenvy_macro = "0.15.7"
+futures-util = "0.3.31"
+mongodb = "3.2.3"
+sentry = "0.37.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+tokio = { version = "1.45.0", features = ["full"] }
