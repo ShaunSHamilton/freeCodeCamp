@@ -21,3 +21,13 @@ Run the Docker container:
 ```bash
 docker run -d exam-moderation-service
 ```
+
+## Testing
+
+1. Seed database with exam and attempt
+
+```bash
+pnpm run seed:exam-env --attempt
+```
+
+2. `cargo test`

@@ -1,34 +1,25 @@
-ARG TARGET=x86_64-unknown-linux-gnu
 ARG BIN_NAME=exam-moderation-service
 ARG PROJECT_DIR=tools/${BIN_NAME}
 
-# Compile binary
-FROM rust:1-slim as builder
-
+FROM rust:1 AS chef
+RUN cargo install cargo-chef
+ARG PROJECT_DIR
 WORKDIR /app
 
-# Copy only the Cargo manifest files first for dependency caching
-COPY ${PROJECT_DIR}/Cargo.toml ${PROJECT_DIR}/Cargo.lock ./
+FROM chef AS planner
+COPY ${PROJECT_DIR} ./
+RUN cargo chef prepare --recipe-path recipe.json
 
-# Build dependencies (this layer will be cached if Cargo files don't change)
-RUN cargo build --release --target ${TARGET} --bin ${BIN_NAME}
+FROM chef AS builder
+ARG PROJECT_DIR
+COPY --from=planner /app/recipe.json recipe.json
+# Build dependencies
+RUN cargo chef cook --release --recipe-path recipe.json
+# Build application
+COPY ${PROJECT_DIR} ./
+RUN cargo build --release
 
-# Copy the entire source directory
-COPY ${PROJECT_DIR}/src ./src
-
-# Build the final executable
-RUN cargo build --release --target ${TARGET} --bin ${BIN_NAME}
-
-# Create runtime image
-FROM debian:bullseye-slim
-
-WORKDIR /app
-
-# Copy the built executable from the builder stage
-COPY --from=builder /app/target/${TARGET}/release/${BIN_NAME} ./
-
-# Set execute permissions
-RUN chmod +x ./exam-moderation-service
-
-# Command to run when the container starts
-CMD ["./exam-moderation-service"]
+FROM gcr.io/distroless/cc-debian12 AS runtime
+ARG BIN_NAME
+COPY --from=builder /app/target/release/${BIN_NAME} /
+ENTRYPOINT ["./exam-moderation-service"]

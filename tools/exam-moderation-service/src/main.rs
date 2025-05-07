@@ -1,25 +1,39 @@
 use futures_util::StreamExt;
 use mongodb::bson::doc;
 use sentry::types::Dsn;
+use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
 mod db;
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::fmt::layer())
+        .with(sentry::integrations::tracing::layer())
+        .with(EnvFilter::from_default_env())
+        .init();
     let sentry_dsn = dotenvy_macro::dotenv!("SENTRY_DSN");
     let _guard = if valid_sentry_dsn(sentry_dsn) {
+        tracing::info!("initializing Sentry");
         // NOTE: Events are only emitted, once the guard goes out of scope.
         Some(sentry::init((
             sentry_dsn,
             sentry::ClientOptions {
                 release: sentry::release_name!(),
+                traces_sample_rate: 1.0,
                 ..Default::default()
             },
         )))
     } else {
+        tracing::warn!("Sentry DSN is invalid. skipping initialization");
         None
     };
 
+    let _ = update_moderation_collection().await;
+}
+
+#[tracing::instrument]
+async fn update_moderation_collection() {
     let mongo_uri = dotenvy_macro::dotenv!("MONGOHQ_URL");
     let client = db::client(mongo_uri).await.unwrap();
     let moderation_collection = db::get_collection(&client, "ExamModeration").await.unwrap();
@@ -64,3 +78,12 @@ pub fn valid_sentry_dsn(url: &str) -> bool {
 }
 
 // Tests are needed for schema changes
+#[cfg(test)]
+mod tests {
+    use crate::update_moderation_collection;
+
+    #[tokio::test]
+    async fn moderation_record_is_created() {
+        let _ = update_moderation_collection().await;
+    }
+}
