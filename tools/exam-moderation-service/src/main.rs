@@ -31,13 +31,17 @@ async fn main() {
         None
     };
 
-    let _ = update_moderation_collection().await;
+    if let Err(e) = update_moderation_collection().await {
+        tracing::error!("Error updating moderation collection: {}", e);
+    } else {
+        tracing::info!("Successfully updated moderation collection");
+    }
 }
 
 #[tracing::instrument]
-async fn update_moderation_collection() {
+async fn update_moderation_collection() -> anyhow::Result<()> {
     let mongo_uri = dotenvy_macro::dotenv!("MONGOHQ_URL");
-    let client = db::client(mongo_uri).await.unwrap();
+    let client = db::client(mongo_uri).await?;
 
     let moderation_collection =
         db::get_collection::<ExamModeration>(&client, "ExamModeration").await;
@@ -47,20 +51,17 @@ async fn update_moderation_collection() {
     // For all expired attempts, create a moderation entry
     // 1. Get all exams
     // 2. Find all attempts where `(attempt.startTimeInMS + exam.config.totalTimeInMS) < now`
-    let mut exams = exam_collection.find(doc! {}).await.unwrap();
+    let mut exams = exam_collection.find(doc! {}).await?;
     while let Some(exam) = exams.next().await {
-        let exam = exam.unwrap();
+        let exam = exam?;
         let exam_id = exam.id;
         let total_time_in_ms = exam.config.total_time_in_ms;
 
         // Get all attempts for this exam
-        let mut attempts = attempt_collection
-            .find(doc! {"examId": exam_id})
-            .await
-            .unwrap();
+        let mut attempts = attempt_collection.find(doc! {"examId": exam_id}).await?;
 
         while let Some(attempt) = attempts.next().await {
-            let attempt = attempt.unwrap();
+            let attempt = attempt?;
             let start_time_in_ms = attempt.start_time_in_ms;
             if start_time_in_ms + total_time_in_ms < chrono::Utc::now().timestamp_millis() {
                 let exam_moderation = ExamModeration {
@@ -68,13 +69,11 @@ async fn update_moderation_collection() {
                     exam_attempt_id: attempt.id,
                 };
                 // Create a moderation entry
-                moderation_collection
-                    .insert_one(exam_moderation)
-                    .await
-                    .unwrap();
+                moderation_collection.insert_one(exam_moderation).await?;
             }
         }
     }
+    Ok(())
 }
 
 pub fn valid_sentry_dsn(url: &str) -> bool {
