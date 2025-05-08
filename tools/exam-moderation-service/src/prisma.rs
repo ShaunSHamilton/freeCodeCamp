@@ -1,15 +1,21 @@
 //! These structs are partial representations of the collections in the database.
 //! Only the used fields are included.
 
-use mongodb::bson::oid::ObjectId;
+use mongodb::bson::{DateTime, oid::ObjectId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ExamModeration {
     #[serde(rename = "_id")]
     pub id: ObjectId,
+    pub approved: bool,
     #[serde(rename = "examAttemptId")]
     pub exam_attempt_id: ObjectId,
+    pub feedback: Option<String>,
+    #[serde(rename = "moderationDate")]
+    pub moderation_date: Option<DateTime>,
+    #[serde(rename = "submissionDate")]
+    pub submission_date: DateTime,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
