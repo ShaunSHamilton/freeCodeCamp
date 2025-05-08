@@ -1,17 +1,14 @@
-use mongodb::{
-    Client, Collection,
-    bson::{Document, doc},
-    options::ClientOptions,
-};
+use mongodb::{Client, Collection, bson::doc, options::ClientOptions};
+use serde::{Deserialize, Serialize};
 
-pub async fn get_collection(
-    client: &Client,
-    collection_name: &str,
-) -> mongodb::error::Result<Collection<Document>> {
+pub async fn get_collection<'d, T>(client: &Client, collection_name: &str) -> Collection<T>
+where
+    T: Send + Sync + Deserialize<'d> + Serialize,
+{
     let db = client.database("freecodecamp");
 
-    let collection = db.collection::<Document>(collection_name);
-    Ok(collection)
+    let collection = db.collection::<T>(collection_name);
+    collection
 }
 
 pub async fn client(uri: &str) -> mongodb::error::Result<Client> {

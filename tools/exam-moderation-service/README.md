@@ -31,3 +31,9 @@ pnpm run seed:exam-env --attempt
 ```
 
 2. `cargo test`
+
+## Design Philosophy
+
+Sentry error events are emitted when things that should not go wrong, go wrong.
+
+Sentry traces (transactions) are emitted to log things, and to show errors that are allowed to happen.

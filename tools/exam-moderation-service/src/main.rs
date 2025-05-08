@@ -1,9 +1,11 @@
 use futures_util::StreamExt;
-use mongodb::bson::doc;
+use mongodb::bson::{doc, oid::ObjectId};
+use prisma::{EnvExam, EnvExamAttempt, ExamModeration};
 use sentry::types::Dsn;
 use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
 mod db;
+mod prisma;
 
 #[tokio::main]
 async fn main() {
@@ -36,9 +38,11 @@ async fn main() {
 async fn update_moderation_collection() {
     let mongo_uri = dotenvy_macro::dotenv!("MONGOHQ_URL");
     let client = db::client(mongo_uri).await.unwrap();
-    let moderation_collection = db::get_collection(&client, "ExamModeration").await.unwrap();
-    let attempt_collection = db::get_collection(&client, "EnvExamAttempt").await.unwrap();
-    let exam_collection = db::get_collection(&client, "EnvExam").await.unwrap();
+
+    let moderation_collection =
+        db::get_collection::<ExamModeration>(&client, "ExamModeration").await;
+    let attempt_collection = db::get_collection::<EnvExamAttempt>(&client, "EnvExamAttempt").await;
+    let exam_collection = db::get_collection::<EnvExam>(&client, "EnvExam").await;
 
     // For all expired attempts, create a moderation entry
     // 1. Get all exams
@@ -46,12 +50,8 @@ async fn update_moderation_collection() {
     let mut exams = exam_collection.find(doc! {}).await.unwrap();
     while let Some(exam) = exams.next().await {
         let exam = exam.unwrap();
-        let exam_id = exam.get_object_id("_id").unwrap();
-        let total_time_in_ms = exam
-            .get_document("config")
-            .unwrap()
-            .get_i64("totalTimeInMS")
-            .unwrap();
+        let exam_id = exam.id;
+        let total_time_in_ms = exam.config.total_time_in_ms;
 
         // Get all attempts for this exam
         let mut attempts = attempt_collection
@@ -61,11 +61,15 @@ async fn update_moderation_collection() {
 
         while let Some(attempt) = attempts.next().await {
             let attempt = attempt.unwrap();
-            let start_time_in_ms = attempt.get_i64("startTimeInMS").unwrap();
+            let start_time_in_ms = attempt.start_time_in_ms;
             if start_time_in_ms + total_time_in_ms < chrono::Utc::now().timestamp_millis() {
+                let exam_moderation = ExamModeration {
+                    id: ObjectId::new(),
+                    exam_attempt_id: attempt.id,
+                };
                 // Create a moderation entry
                 moderation_collection
-                    .insert_one(doc! {"examAttemptId": attempt.get_object_id("_id").unwrap()})
+                    .insert_one(exam_moderation)
                     .await
                     .unwrap();
             }
