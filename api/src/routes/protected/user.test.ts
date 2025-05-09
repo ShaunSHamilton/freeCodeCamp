@@ -2,7 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import type { Prisma } from '@prisma/client';
+import {
+  DailyCodingChallengeLanguage,
+  DailyCodingChallenges,
+  type Prisma
+} from '@prisma/client';
 import { ObjectId } from 'mongodb';
 import _ from 'lodash';
 
@@ -18,6 +22,7 @@ import {
 import { JWT_SECRET } from '../../utils/env';
 import {
   clearEnvExam,
+  oid,
   seedEnvExam,
   seedEnvExamAttempt,
   seedExamEnvExamAuthToken
@@ -77,13 +82,6 @@ const testUserData: Prisma.userCreateInput = {
       }
     }
   ],
-  completedDailyCodingChallenges: [
-    {
-      id: '5900f36e1000cf542c50fe80',
-      completedDate: 1742941672524,
-      completedLanguages: ['python', 'javascript']
-    }
-  ],
   partiallyCompletedChallenges: [{ id: '123', completedDate: 123 }],
   completedExams: [],
   quizAttempts: [
@@ -123,6 +121,21 @@ const testUserData: Prisma.userCreateInput = {
   yearsTopContributor: ['2018'],
   twitter: '@foobar',
   linkedin: 'linkedin.com/foobar'
+};
+
+const testDailyCodingChallengeData: DailyCodingChallenges = {
+  id: oid(),
+  userId: testUserData.id!,
+  completedDailyCodingChallenges: [
+    {
+      id: '5900f36e1000cf542c50fe80',
+      completedDate: 1742941672524,
+      languages: [
+        DailyCodingChallengeLanguage.PYTHON,
+        DailyCodingChallengeLanguage.JAVASCRIPT
+      ]
+    }
+  ]
 };
 
 const minimalUserData: Prisma.userCreateInput = {
@@ -224,13 +237,8 @@ const publicUserData = {
       }
     }
   ],
-  completedDailyCodingChallenges: [
-    {
-      id: '5900f36e1000cf542c50fe80',
-      completedDate: 1742941672524,
-      completedLanguages: ['python', 'javascript']
-    }
-  ],
+  completedDailyCodingChallenges:
+    testDailyCodingChallengeData.completedDailyCodingChallenges,
   completedExams: testUserData.completedExams,
   completedSurveys: [], // TODO: add surveys
   quizAttempts: testUserData.quizAttempts,
@@ -303,7 +311,6 @@ const baseProgressData = {
   isRelationalDatabaseCertV8: false,
   isCollegeAlgebraPyCertV8: false,
   completedChallenges: [],
-  completedDailyCodingChallenges: [],
   completedExams: [],
   savedChallenges: [],
   partiallyCompletedChallenges: [],
@@ -457,6 +464,17 @@ describe('userRoutes', () => {
         expect(countAfter).toBe(0);
         expect(res.status).toBe(200);
       });
+
+      test("deletes all user's daily coding challenges", async () => {
+        await fastifyTestInstance.prisma.dailyCodingChallenges.create({
+          data: testDailyCodingChallengeData
+        });
+        const res = await superPost('/account/delete');
+        const dailyCodingChallenges =
+          await fastifyTestInstance.prisma.dailyCodingChallenges.count();
+        expect(dailyCodingChallenges).toBe(0);
+        expect(res.status).toBe(200);
+      });
     });
 
     describe('/account/reset-progress', () => {
@@ -511,6 +529,17 @@ describe('userRoutes', () => {
       });
 
       test.todo('POST resets the user to the default state');
+
+      test("deletes all user's daily coding challenges", async () => {
+        await fastifyTestInstance.prisma.dailyCodingChallenges.create({
+          data: testDailyCodingChallengeData
+        });
+        const res = await superPost('/account/reset-progress');
+        const dailyCodingChallenges =
+          await fastifyTestInstance.prisma.dailyCodingChallenges.count();
+        expect(dailyCodingChallenges).toBe(0);
+        expect(res.status).toBe(200);
+      });
     });
 
     describe('/user/user-token', () => {
@@ -617,6 +646,9 @@ describe('userRoutes', () => {
           where: { email: testUserData.email },
           data: testUserData
         });
+        await fastifyTestInstance.prisma.dailyCodingChallenges.create({
+          data: testDailyCodingChallengeData
+        });
       });
 
       afterEach(async () => {
@@ -628,6 +660,9 @@ describe('userRoutes', () => {
             where: { userId: defaultUserId }
           }
         );
+        await fastifyTestInstance.prisma.dailyCodingChallenges.deleteMany({
+          where: { userId: defaultUserId }
+        });
       });
 
       test('GET rejects with 500 status code if the username is missing', async () => {
