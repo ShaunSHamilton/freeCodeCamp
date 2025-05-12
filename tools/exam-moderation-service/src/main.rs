@@ -118,6 +118,12 @@ pub fn valid_sentry_dsn(url: &str) -> bool {
 // Tests are needed for schema changes
 #[cfg(test)]
 mod tests {
+    use mongodb::{
+        Client,
+        bson::Document,
+        change_stream::{ChangeStream, event::ChangeStreamEvent},
+    };
+
     use crate::*;
 
     /// Add exam data, add attempt data, call function, check if moderation record is created
@@ -146,7 +152,7 @@ mod tests {
                 total_time_in_ms: 2000,
             },
         };
-        exam_collection
+        let a = exam_collection
             .insert_many([&exam_1, &exam_2])
             .await
             .unwrap();
