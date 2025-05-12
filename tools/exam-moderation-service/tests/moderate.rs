@@ -12,8 +12,9 @@ use mongodb::bson::{doc, oid::ObjectId};
 /// Call again, ensure new record is created
 #[tokio::test]
 async fn moderation_record_is_created() {
-    let mongo_uri = dotenvy_macro::dotenv!("MONGOHQ_URL");
-    let client = db::client(mongo_uri).await.unwrap();
+    dotenvy::dotenv().ok();
+    let mongo_uri = std::env::var("MONGOHQ_URL").unwrap();
+    let client = db::client(&mongo_uri).await.unwrap();
 
     let _guard = MongoDrop::new(&client.database("freecodecamp"))
         .await

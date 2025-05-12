@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.98"
 chrono = "0.4.41"
-dotenvy_macro = "0.15.7"
+dotenvy = "0.15.7"
 futures-util = "0.3.31"
 mongodb = "3.2.3"
 sentry = { version = "0.38.0", features = ["tracing"] }

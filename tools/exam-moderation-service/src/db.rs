@@ -38,8 +38,8 @@ pub async fn client(uri: &str) -> mongodb::error::Result<Client> {
 
 #[tracing::instrument]
 pub async fn update_moderation_collection() -> anyhow::Result<()> {
-    let mongo_uri = dotenvy_macro::dotenv!("MONGOHQ_URL");
-    let client = client(mongo_uri).await?;
+    let mongo_uri = std::env::var("MONGOHQ_URL")?;
+    let client = client(&mongo_uri).await?;
 
     let moderation_collection = get_collection::<ExamModeration>(&client, "ExamModeration").await;
     let attempt_collection = get_collection::<EnvExamAttempt>(&client, "EnvExamAttempt").await;
