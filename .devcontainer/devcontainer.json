@@ -1,7 +1,6 @@
 {
   "name": "freeCodeCampDC",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "devcontainer",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   // "features": {},
   "forwardPorts": [3000, 8000]
 }
