@@ -3,7 +3,7 @@ services:
     depends_on:
       - mongo-db
       - mongo-setup
-    image: mcr.microsoft.com/devcontainers/typescript-node:22
+    image: ghcr.io/freecodecamp/gitpod:latest
     volumes:
       - ../..:/workspaces:cached
     network_mode: service:mongo-db
