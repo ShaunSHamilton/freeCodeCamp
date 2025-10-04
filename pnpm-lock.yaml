@@ -1079,6 +1079,25 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@20.12.8)(@vitest/ui@3.2.4)(jiti@2.6.1)(jsdom@26.1.0)(msw@2.8.7(@types/node@20.12.8)(typescript@5.8.2))(terser@5.28.1)(tsx@4.19.1)(yaml@2.8.0)
 
+  tools/scripts/migrate:
+    dependencies:
+      dotenv:
+        specifier: '16'
+        version: 16.4.5
+      mongodb:
+        specifier: '6'
+        version: 6.10.0(@aws-sdk/credential-providers@3.521.0)(socks@2.8.3)
+      pino:
+        specifier: '9'
+        version: 9.7.0
+      pino-pretty:
+        specifier: '10'
+        version: 10.2.3
+    devDependencies:
+      tsx:
+        specifier: '4'
+        version: 4.19.1
+
   tools/scripts/seed:
     devDependencies:
       debug:
