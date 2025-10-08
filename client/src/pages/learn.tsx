@@ -9,6 +9,7 @@ import { Container, Col, Row, Spacer, Callout } from '@freecodecamp/ui';
 import Intro from '../components/Intro';
 import Map from '../components/Map';
 import LearnLayout from '../components/layouts/learn';
+import { useClaimableCertsNotification } from '../components/helpers/use-claimable-certs-notification';
 import {
   isSignedInSelector,
   userSelector,
@@ -72,6 +73,7 @@ function LearnPage({
   const { name, completedChallengeCount, isDonating } = user ?? EMPTY_USER;
 
   const { t } = useTranslation();
+  useClaimableCertsNotification();
 
   const slug = challengeNode?.challenge?.fields?.slug || '';
 

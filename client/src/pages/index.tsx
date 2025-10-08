@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useGrowthBook } from '@growthbook/growthbook-react';
 import SEO from '../components/seo';
 import { Loader } from '../components/helpers';
+import { useClaimableCertsNotification } from '../components/helpers/use-claimable-certs-notification';
 import LandingTopB from '../components/landing/components/landing-top-b';
 import LandingTop from '../components/landing/components/landing-top';
 import Testimonials from '../components/landing/components/testimonials';
@@ -32,6 +33,8 @@ const Landing = ({ showLandingPageRedesign }: LandingProps) => (
 function IndexPage(): JSX.Element {
   const { t } = useTranslation();
   const growthbook = useGrowthBook();
+  useClaimableCertsNotification();
+
   if (growthbook && growthbook.ready) {
     console.error('GrowthBook Ready', growthbook);
     const showLandingPageRedesign = growthbook.getFeatureValue(
