@@ -6,7 +6,7 @@ services:
     image: mcr.microsoft.com/devcontainers/typescript-node:22
     volumes:
       - ../..:/workspaces:cached
-    network_mode: service:mongo-db
+    network_mode: host
     command: sleep infinity
 
   mongo-db:
