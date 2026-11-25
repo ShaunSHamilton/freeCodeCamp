@@ -5,6 +5,7 @@ import { empty, of } from 'rxjs';
 import {
   catchError,
   concat,
+  exhaustMap,
   retry,
   switchMap,
   tap,
@@ -247,7 +248,7 @@ function submitMsTrophy(type, state) {
 export default function completionEpic(action$, state$) {
   return action$.pipe(
     ofType(actionTypes.submitChallenge),
-    switchMap(({ type }) => {
+    exhaustMap(({ type }) => {
       const state = state$.value;
 
       const {
