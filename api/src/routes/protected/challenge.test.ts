@@ -1558,6 +1558,56 @@ describe('challengeRoutes', () => {
         });
         expect(resUpdate.statusCode).toBe(200);
       });
+
+      test('POST handles concurrent duplicate submissions', async () => {
+        const responses = await Promise.all(
+          Array.from({ length: 3 }, () =>
+            superPost('/encoded/modern-challenge-completed').send({
+              ...baseJsProjectBody,
+              files: encodedJsFiles
+            })
+          )
+        );
+
+        const user = await fastifyTestInstance.prisma.user.findFirstOrThrow({
+          where: { email: 'foo@bar.com' }
+        });
+
+        expect(user.completedChallenges).toHaveLength(1);
+        expect(user.savedChallenges).toHaveLength(1);
+        expect(user.progressTimestamps).toHaveLength(1);
+
+        expect(responses.map(res => res.statusCode)).toStrictEqual([
+          200, 200, 200
+        ]);
+        const bodies = responses.map(
+          res => res.body as { alreadyCompleted: boolean; points: number }
+        );
+        expect(bodies.filter(body => !body.alreadyCompleted)).toHaveLength(1);
+        expect(bodies.map(body => body.points)).toStrictEqual([1, 1, 1]);
+      });
+
+      test('POST handles concurrent submissions of different challenges', async () => {
+        const responses = await Promise.all([
+          superPost('/encoded/modern-challenge-completed').send({
+            ...baseJsProjectBody,
+            files: encodedJsFiles
+          }),
+          superPost('/encoded/modern-challenge-completed').send(
+            HtmlChallengeBody
+          )
+        ]);
+
+        const user = await fastifyTestInstance.prisma.user.findFirstOrThrow({
+          where: { email: 'foo@bar.com' }
+        });
+
+        expect(responses.map(res => res.statusCode)).toStrictEqual([200, 200]);
+        expect(
+          user.completedChallenges.map(({ id }) => id).sort()
+        ).toStrictEqual([HtmlChallengeId, JsProjectId].sort());
+        expect(user.progressTimestamps).toHaveLength(2);
+      });
     });
 
     describe('/daily-coding-challenge-completed', () => {

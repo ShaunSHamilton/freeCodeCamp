@@ -167,15 +167,9 @@ export const challengeRoutes: FastifyPluginCallbackTypebox = (
         id: projectId,
         completedDate: Date.now()
       };
-      const progressTimestamps = user.progressTimestamps as ProgressTimestamp[];
-      const points = getPoints(progressTimestamps);
 
-      const { alreadyCompleted, completedDate } = await updateUserChallengeData(
-        fastify,
-        user,
-        projectId,
-        challenge
-      );
+      const { alreadyCompleted, completedDate, points } =
+        await updateUserChallengeData(fastify, user, projectId, challenge);
 
       fastify.Sentry?.metrics?.count('challenge.completed', 1, {
         attributes: {
@@ -188,7 +182,7 @@ export const challengeRoutes: FastifyPluginCallbackTypebox = (
         // TODO(Post-MVP): audit the client and remove this if the client does
         // not use it.
         completedDate: normalizeDate(completedDate),
-        points: alreadyCompleted ? points : points + 1
+        points
       });
     }
   );
@@ -222,23 +216,14 @@ export const challengeRoutes: FastifyPluginCallbackTypebox = (
         });
       }
 
-      const user = await fastify.prisma.user.findUniqueOrThrow({
-        where: { id: req.user?.id },
-
-        select: userChallengeSelect
-      });
-      const progressTimestamps = user.progressTimestamps as
-        ProgressTimestamp[] | null;
-      const points = getPoints(progressTimestamps);
-
       const completedChallenge = {
         completedDate: Date.now(),
         ...req.body
       };
 
-      const { alreadyCompleted } = await updateUserChallengeData(
+      const { alreadyCompleted, points } = await updateUserChallengeData(
         fastify,
-        user,
+        { id: req.user!.id },
         req.body.id,
         completedChallenge
       );
@@ -251,7 +236,7 @@ export const challengeRoutes: FastifyPluginCallbackTypebox = (
 
       return {
         alreadyCompleted,
-        points: alreadyCompleted ? points : points + 1,
+        points,
         completedDate: completedChallenge.completedDate
       };
     }
@@ -617,24 +602,16 @@ export const challengeRoutes: FastifyPluginCallbackTypebox = (
           return reply.code(403).send(msTrophyStatus);
         }
 
-        const user = await fastify.prisma.user.findUniqueOrThrow({
-          where: { id: req.user?.id },
-          select: userChallengeSelect
-        });
-
-        const progressTimestamps =
-          user.progressTimestamps as ProgressTimestamp[];
-
         const completedChallenge = {
           id: challengeId,
           solution: msTrophyStatus.msUserAchievementsApiUrl,
           completedDate: Date.now()
         };
 
-        const { alreadyCompleted, completedDate } =
+        const { alreadyCompleted, completedDate, points } =
           await updateUserChallengeData(
             fastify,
-            user,
+            { id: req.user!.id },
             challengeId,
             completedChallenge
           );
@@ -647,7 +624,7 @@ export const challengeRoutes: FastifyPluginCallbackTypebox = (
 
         reply.send({
           alreadyCompleted,
-          points: getPoints(progressTimestamps) + (alreadyCompleted ? 0 : 1),
+          points,
           completedDate: normalizeDate(completedDate)
         });
       } catch (error) {
@@ -1364,23 +1341,15 @@ async function postModernChallengeCompleted(
     files: CompletedChallenge['files'];
   }
 ) {
-  const user = await fastify.prisma.user.findUniqueOrThrow({
-    where: { id: userId },
-    select: userChallengeSelect
-  });
-  const RawProgressTimestamp = user.progressTimestamps as
-    ProgressTimestamp[] | null;
-  const points = getPoints(RawProgressTimestamp);
-
   const completedChallenge: CompletedChallenge = {
     id,
     files,
     completedDate: Date.now()
   };
 
-  if (challengeType === challengeTypes.multifileCertProject) {
+  const needsModeration = challengeType === challengeTypes.multifileCertProject;
+  if (needsModeration) {
     completedChallenge.isManuallyApproved = false;
-    user.needsModeration = true;
   }
 
   if (
@@ -1391,8 +1360,16 @@ async function postModernChallengeCompleted(
     completedChallenge.challengeType = challengeType;
   }
 
-  const { alreadyCompleted, userSavedChallenges: savedChallenges } =
-    await updateUserChallengeData(fastify, user, id, completedChallenge);
+  const {
+    alreadyCompleted,
+    points,
+    userSavedChallenges: savedChallenges
+  } = await updateUserChallengeData(
+    fastify,
+    { id: userId, needsModeration },
+    id,
+    completedChallenge
+  );
 
   fastify.Sentry?.metrics?.count('challenge.completed', 1, {
     attributes: {
@@ -1402,7 +1379,7 @@ async function postModernChallengeCompleted(
 
   return {
     alreadyCompleted,
-    points: alreadyCompleted ? points : points + 1,
+    points,
     completedDate: completedChallenge.completedDate,
     savedChallenges
   };
